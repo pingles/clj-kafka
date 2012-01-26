@@ -4,6 +4,8 @@ Simple Clojure interface to [Kafka](http://incubator.apache.org/kafka/).
 
 It's currently a snapshot only until things flesh out a little more. [API Documentation is also available](http://pingles.github.com/clj-kafka/).
 
+Note: Kafka binaries are not currently published to any public repositories. Additionally, the 0.7 release was [published as source](http://incubator.apache.org/kafka/downloads.html). This library uses [a build of the 0.7 incubator release published on Clojars](http://clojars.org/org.clojars.paul/core-kafka_2.8.0).
+
 ## Installing
 
 Add the following to your [Leiningen](http://github.com/technomancy/leiningen) `project.clj`:
