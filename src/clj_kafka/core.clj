@@ -8,8 +8,16 @@
     (doseq [[n v] m] (.setProperty props n v))
     props))
 
+(defmacro with-resource
+  [binding close-fn & body]
+  `(let ~binding
+     (try
+       (do ~@body)
+       (finally
+        (~close-fn ~(binding 0))))))
+
 (defprotocol ToClojure
-  (to-clojure [_] "Converts type to Clojure structure"))
+  (to-clojure [x] "Converts type to Clojure structure"))
 
 (extend-protocol ToClojure
   MessageAndOffset

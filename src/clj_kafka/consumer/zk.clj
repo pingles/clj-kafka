@@ -2,14 +2,6 @@
   (:import [kafka.consumer ConsumerConfig Consumer])
   (:use [clj-kafka.core :only (as-properties to-clojure)]))
 
-(defmacro with-resource
-  [binding close-fn & body]
-  `(let ~binding
-     (try
-       (do ~@body)
-       (finally
-        (~close-fn ~(binding 0))))))
-
 (defn consumer
   "Uses information in Zookeeper to connect to Kafka. More info on settings
    is available here: http://incubator.apache.org/kafka/configuration.html
