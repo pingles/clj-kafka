@@ -2,7 +2,7 @@
 
 Simple Clojure interface to [Kafka](http://incubator.apache.org/kafka/).
 
-It's currently a snapshot only until things flesh out a little more.
+It's currently a snapshot only until things flesh out a little more. [API Documentation is also available](http://pingles.github.com/clj-kafka/).
 
 ## Installing
 
