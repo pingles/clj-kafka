@@ -2,7 +2,7 @@
   (:import [kafka.javaapi.producer Producer ProducerData]
            [kafka.producer ProducerConfig]
            [kafka.message Message])
-  (:use [clj-kafka.core :only (as-properties as-bytes)]))
+  (:use [clj-kafka.core :only (as-properties)]))
 
 (defn producer
   "Creates a Producer. m is the configuration
