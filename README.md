@@ -43,7 +43,7 @@ Or sending a single message:
 ```clj
 (use 'clj-kafka.consumer.simple)
 
-(def c (create-consumer "localhost" 9092))
+(def c (consumer "localhost" 9092))
 (def f (fetch "test" 0 0 4096))
 
 (messages c f)
@@ -59,7 +59,8 @@ The Zookeeper consumer uses broker information contained within Zookeeper to con
 (use 'clj-kafka.consumer.zk)
 (use 'clj-kafka.core)
 
-(def config {"zk.connect" "localhost:2181"})
+(def config {"zk.connect" "localhost:2181" 
+             "groupid"    "my-task-group"})
 
 (with-resource [c (consumer config)]
   shutdown
