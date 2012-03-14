@@ -1,5 +1,6 @@
 (ns clj-kafka.core
-  (:import [java.util Properties]
+  (:import [java.nio ByteBuffer]
+           [java.util Properties]
            [kafka.message MessageAndOffset Message]))
 
 (defn as-properties
@@ -23,7 +24,11 @@
   MessageAndOffset
   (to-clojure [x] {:message (to-clojure (.message x))
                    :offset (.offset x)})
+  ByteBuffer
+  (to-clojure [x] (let [b (byte-array (.remaining x))]
+                    (.get x b)
+                    b))
   Message
   (to-clojure [x] {:crc (.checksum x)
-                   :payload (.array (.payload x))
+                   :payload (to-clojure (.payload x))
                    :size (.size x)}))
