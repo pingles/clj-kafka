@@ -1,4 +1,4 @@
-(defproject clj-kafka "0.0.3-0.7-SNAPSHOT"
+(defproject clj-kafka "0.0.4-0.7-SNAPSHOT"
   :description "Clojure wrapper for Kafka's Java API"
   :dependencies [[org.clojure/clojure "1.3.0"]
                  [org.clojars.paul/core-kafka_2.8.0 "0.7.0-1" :exclusions [javax.mail/mail
@@ -8,4 +8,5 @@
                                                                            jline/jline
                                                                            net.sf.jopt-simple/jopt-simple
                                                                            junit/junit]]
-                 [org.scala-lang/scala-library "2.8.0"]])
+                 [org.scala-lang/scala-library "2.8.0"]
+                 [zookeeper-clj "0.9.2"]])

@@ -1,6 +1,7 @@
 (ns clj-kafka.consumer.zk
   (:import [kafka.consumer ConsumerConfig Consumer])
-  (:use [clj-kafka.core :only (as-properties to-clojure)]))
+  (:use [clj-kafka.core :only (as-properties to-clojure with-resource)])
+  (:require [zookeeper :as zk]))
 
 (defn consumer
   "Uses information in Zookeeper to connect to Kafka. More info on settings
@@ -34,3 +35,12 @@
         streams (.createMessageStreams consumer topic-map)
         stream (first (.get streams topic))]
     (map to-clojure (iterator-seq (.iterator stream)))))
+
+
+(defn topics
+  "Connects to Zookeeper to read the list of topics. Use the same config
+   as with consumer, uses the zk.connect value to connect to the client"
+  [config]
+  (with-resource [z (zk/connect (get config "zk.connect"))]
+    zk/close 
+    (sort (zk/children z "/brokers/topics"))))
