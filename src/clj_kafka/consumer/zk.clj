@@ -39,7 +39,7 @@
   (let [[queue-seq queue-put] (pipe)]
     (doseq [[topic streams] (.createMessageStreams consumer (topic-map topics))]
       (future (doseq [msg (iterator-seq (.iterator (first streams)))]
-                (queue-put (assoc (to-clojure msg) :topic topic)))))
+                (queue-put (-> msg to-clojure (assoc :topic topic))))))
     queue-seq))
 
 (defn topics
