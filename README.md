@@ -11,7 +11,7 @@ Note: Kafka binaries are not currently published to any public repositories. Add
 Add the following to your [Leiningen](http://github.com/technomancy/leiningen) `project.clj`:
 
 ```clj
-[clj-kafka "0.0.2-0.7-SNAPSHOT"]
+[clj-kafka "0.0.5-0.7-SNAPSHOT"]
 ```
 
 ## Usage
@@ -67,6 +67,12 @@ The Zookeeper consumer uses broker information contained within Zookeeper to con
   (take 5 (messages c "test")))
 
 ({:crc 3417370184, :payload #<byte[] [B@698b41da>, :size 22} {:crc 3417370184, :payload #<byte[] [B@698b41da>, :size 22} {:crc 960674935, :payload #<byte[] [B@698b41da>, :size 86} {:crc 3651343620, :payload #<byte[] [B@698b41da>, :size 20} {:crc 2012604996, :payload #<byte[] [B@698b41da>, :size 20})
+```
+
+It's also now possible to consume messages from multiple topics at the same time. These are aggregated and returned as a single sequence:
+
+```clojure
+(take 5 (messages c "test1" "test2"))
 ```
 
 ## License
