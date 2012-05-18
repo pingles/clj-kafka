@@ -28,28 +28,19 @@
   [consumer]
   (.shutdown consumer))
 
-(defn- build-topic-map
-  "Creates the topic map for the consumer from a list of topics.
-   All topics will be requested as a single stream."
+(defn- topic-map
   [topics]
   (apply hash-map (interleave topics
                               (repeat (Integer/valueOf 1)))))
 
 (defn messages
-  "Creates a sequence of messages from the given topics.
-
-   topics can be either a list of strings with topic names, or
-   an associative structure that contains an optional function that
-   will be used to interpret the message, the result of which will
-   then be inserted into the merged sequence."
-  [consumer topics]
-  (let [topic-names (if (associative? topics) (keys topics) topics)
-        message-streams (.createMessageStreams consumer (build-topic-map topic-names))
+  "Creates a sequence of messages from the given topics."
+  [consumer & topics]
+  (let [topic-and-streams (.createMessageStreams consumer (topic-map topics))
         [queue-seq queue-put] (pipe)]
-    (doseq [[topic streams] message-streams]
-      (let [deserializer (if (associative? topics) (get topics topic) identity)]
-        (future (doseq [msg (iterator-seq (.iterator (first streams)))]
-                  (queue-put (-> msg to-clojure deserializer))))))
+    (doseq [[_ streams] topic-and-streams]
+      (future (doseq [msg (iterator-seq (.iterator (first streams)))]
+                (queue-put (to-clojure msg)))))
     queue-seq))
 
 (defn topics
