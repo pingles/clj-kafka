@@ -36,13 +36,10 @@
 (defn messages
   "Creates a sequence of messages from the given topics."
   [consumer & topics]
-  (let [streams-in (.createMessageStreams consumer (topic-map topics))
-        streams (map (fn [topic]
-                       (first (get streams-in topic)))
-                     topics)
+  (let [topic-and-streams (.createMessageStreams consumer (topic-map topics))
         [queue-seq queue-put] (pipe)]
-    (doseq [stream streams]
-      (future (doseq [msg (iterator-seq (.iterator stream))]
+    (doseq [[_ streams] topic-and-streams]
+      (future (doseq [msg (iterator-seq (.iterator (first streams)))]
                 (queue-put (to-clojure msg)))))
     queue-seq))
 
