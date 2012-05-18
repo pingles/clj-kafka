@@ -1,6 +1,6 @@
 (ns clj-kafka.consumer.zk
   (:import [kafka.consumer ConsumerConfig Consumer])
-  (:use [clj-kafka.core :only (as-properties to-clojure with-resource)])
+  (:use [clj-kafka.core :only (as-properties to-clojure with-resource pipe)])
   (:require [zookeeper :as zk]))
 
 (defn consumer
@@ -28,14 +28,23 @@
   [consumer]
   (.shutdown consumer))
 
-(defn messages
-  "Creates a sequence of messages"
-  [consumer topic]
-  (let [topic-map {topic (Integer/valueOf 1)}
-        streams (.createMessageStreams consumer topic-map)
-        stream (first (.get streams topic))]
-    (map to-clojure (iterator-seq (.iterator stream)))))
+(defn- topic-map
+  [topics]
+  (apply hash-map (interleave topics
+                              (repeat (Integer/valueOf 1)))))
 
+(defn messages
+  "Creates a sequence of messages from the given topics."
+  [consumer & topics]
+  (let [streams-in (.createMessageStreams consumer (topic-map topics))
+        streams (map (fn [topic]
+                       (first (get streams-in topic)))
+                     topics)
+        [queue-seq queue-put] (pipe)]
+    (doseq [stream streams]
+      (future (doseq [msg (iterator-seq (.iterator stream))]
+                (queue-put (to-clojure msg)))))
+    queue-seq))
 
 (defn topics
   "Connects to Zookeeper to read the list of topics. Use the same config
