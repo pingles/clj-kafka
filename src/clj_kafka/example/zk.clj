@@ -10,4 +10,4 @@
   (with-resource [c (consumer config)]
     shutdown
     (doseq [m (messages c "testing" "testing2")]
-      (println "Message: " (String. (:payload m))))))
+      (println (:topic m) ": " (String. (:payload m))))))
