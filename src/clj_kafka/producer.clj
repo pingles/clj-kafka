@@ -23,3 +23,12 @@
    msgs    : a single message, or sequence of messages to send"
   [producer topic msgs]
   (.send producer (ProducerData. topic msgs)))
+
+
+(defprotocol ToMessage
+  "Protocol to be extended to convert types to encoded Message objects"
+  (to-message [x] "Creates a Message instance"))
+
+(extend-protocol ToMessage
+  String
+  (to-message [x] (message (.getBytes x))))
