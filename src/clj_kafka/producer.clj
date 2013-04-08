@@ -9,19 +9,19 @@
    serializer.class : default is kafka.serializer.DefaultEncoder
    zk.connect       : Zookeeper connection. e.g. localhost:2181 "
   [m]
-  (Producer. (ProducerConfig. (as-properties m))))
+  ^Producer (Producer. (ProducerConfig. (as-properties m))))
 
 (defn message
   "Creates a message with the specified payload.
    payload : bytes for the message payload. e.g. (.getBytes \"hello, world\")"
-  [payload]
+  [^:bytes payload]
   (Message. payload))
 
 (defn send-messages
   "Sends a message.
    topic   : a string
    msgs    : a single message, or sequence of messages to send"
-  [producer topic msgs]
+  [^Producer producer ^String topic msgs]
   (.send producer (ProducerData. topic msgs)))
 
 
