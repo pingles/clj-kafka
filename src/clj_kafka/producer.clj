@@ -14,7 +14,7 @@
 (defn message
   "Creates a message with the specified payload.
    payload : bytes for the message payload. e.g. (.getBytes \"hello, world\")"
-  [^:bytes payload]
+  [#^bytes payload]
   (Message. payload))
 
 (defn send-messages
