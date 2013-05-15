@@ -39,15 +39,16 @@
    queue, and a function that inserts items into the queue.
 
    Source: http://clj-me.cgrand.net/2010/04/02/pipe-dreams-are-not-necessarily-made-of-promises/"
-  []
-  (let [q (LinkedBlockingQueue.)
-        EOQ (Object.)
-        NIL (Object.)
-        s (fn queue-seq []
-            (lazy-seq (let [x (.take q)]
-                        (when-not (= EOQ x)
-                          (cons (when-not (= NIL x) x)
-                                (queue-seq))))))]
-    [(s) (fn queue-put
-           ([] (.put q EOQ))
-           ([x] (.put q (or x NIL))))]))
+  ([] (pipe 100))
+  ([size]
+   (let [q (java.util.concurrent.LinkedBlockingQueue. size)
+         EOQ (Object.)
+         NIL (Object.)
+         s (fn queue-seq [] (lazy-seq
+                              (let [x (.take q)]
+                                (when-not (= EOQ x)
+                                  (cons (when-not (= NIL x) x)
+                                        (queue-seq))))))]
+     [(s) (fn queue-put
+            ([] (.put q EOQ))
+            ([x] (.put q (or x NIL))))])))
