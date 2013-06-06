@@ -4,7 +4,7 @@ Simple Clojure interface to [Kafka](http://incubator.apache.org/kafka/).
 
 It's currently a snapshot only until things flesh out a little more. [API Documentation is also available](http://pingles.github.com/clj-kafka/).
 
-Note: Kafka binaries are not currently published to any public repositories. Additionally, the 0.7 release was [published as source](http://incubator.apache.org/kafka/downloads.html). This library uses [a build of the 0.7 incubator release published on Clojars](http://clojars.org/org.clojars.paul/core-kafka_2.8.0).
+Note: Kafka binaries are not currently published to any public repositories. Additionally, the 0.8 release was [published as source](http://incubator.apache.org/kafka/downloads.html). This library uses [a build of the 0.8 incubator release published on Clojars](https://clojars.org/com.uswitch/kafka_2.9.2).
 
 Current build status: ![Build status](https://secure.travis-ci.org/pingles/clj-kafka.png)
 
@@ -13,12 +13,12 @@ Current build status: ![Build status](https://secure.travis-ci.org/pingles/clj-k
 Add the following to your [Leiningen](http://github.com/technomancy/leiningen) `project.clj`:
 
 ```clj
-[clj-kafka "0.0.5-0.7-SNAPSHOT"]
+[clj-kafka "0.1.0-0.8-SNAPSHOT"]
 ```
 
 ## Usage
 
-clj-kafka currently only supports Kafka 0.7.
+clj-kafka currently only supports Kafka 0.8.
 
 ### Producer
 
@@ -61,12 +61,13 @@ The Zookeeper consumer uses broker information contained within Zookeeper to con
 (use 'clj-kafka.consumer.zk)
 (use 'clj-kafka.core)
 
-(def config {"zk.connect" "localhost:2181" 
-             "groupid"    "my-task-group"})
+(def config {"zookeeper.connect" "localhost:2181" 
+             "group.id"    "my-task-group"
+             "auto.offset.reset" "smallest"})
 
 (with-resource [c (consumer config)]
   shutdown
-  (take 5 (messages c "test")))
+  (take 2 (messages c "test")))
 
 ({:crc 3417370184, :payload #<byte[] [B@698b41da>, :size 22} {:crc 3417370184, :payload #<byte[] [B@698b41da>, :size 22} {:crc 960674935, :payload #<byte[] [B@698b41da>, :size 86} {:crc 3651343620, :payload #<byte[] [B@698b41da>, :size 20} {:crc 2012604996, :payload #<byte[] [B@698b41da>, :size 20})
 ```
@@ -79,6 +80,6 @@ It's also now possible to consume messages from multiple topics at the same time
 
 ## License
 
-Copyright &copy; 2012 Paul Ingles
+Copyright &copy; 2013 Paul Ingles
 
 Distributed under the Eclipse Public License, the same as Clojure.
