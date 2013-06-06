@@ -2,9 +2,9 @@
   (:use [clj-kafka.core :only (with-resource)]
         [clj-kafka.consumer.zk :only (consumer shutdown messages)]))
 
-(def config {"zk.connect" "kafka.uswitchinternal.com:2181"
-             "autocommit.enable" "false"
-             "groupid" "group1"})
+(def config {"zk.connect" "localhost:2181"
+             "auto.commit.enable" "false"
+             "group.id" "group1"})
 
 (defn -main []
   (with-resource [c (consumer config)]
