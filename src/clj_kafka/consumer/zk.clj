@@ -11,14 +11,13 @@
    (with-resource [c (consumer m)]
      shutdown
      (take 5 (messages c \"test\")))
-  
+
    Keys:
-   zk.connect             : host:port for Zookeeper. e.g: 127.0.0.1:2181
-   groupid                : consumer group. e.g. group1
-   zk.sessiontimeout.ms   : session timeout. e.g. 400
-   zk.synctime.ms         : Max time for how far a ZK follower can be behind a ZK leader. 200 ms
-   autocommit.interval.ms : the frequency that the consumed offsets are committed to zookeeper.
-   autocommit.enable      : if set to true, the consumer periodically commits to zookeeper the latest consumed offset of each partition"
+   zookeeper.connect             : host:port for Zookeeper. e.g: 127.0.0.1:2181
+   group.id                      : consumer group. e.g. group1
+   auto.offset.reset             : what to do if an offset is out of range, e.g. smallest, largest
+   auto.commit.interval.ms       : the frequency that the consumed offsets are committed to zookeeper.
+   auto.commit.enable            : if set to true, the consumer periodically commits to zookeeper the latest consumed offset of each partition"
   [m]
   (let [config (ConsumerConfig. (as-properties m))]
     (Consumer/createJavaConsumerConnector config)))
