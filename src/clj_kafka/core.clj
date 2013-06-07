@@ -32,7 +32,8 @@
   Message
   (to-clojure [x] {:crc (.checksum x)
                    :payload (to-clojure (.payload x))
-                   :size (.size x)}))
+                   :size (.size x)
+                   :compression (keyword (.. x compressionCodec name))}))
 
 (defn pipe
   "Returns a vector containing a sequence that will read from the

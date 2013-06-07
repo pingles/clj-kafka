@@ -1,6 +1,6 @@
 (ns clj-kafka.producer
-  (:import [kafka.javaapi.producer Producer ProducerData]
-           [kafka.producer ProducerConfig]
+  (:import [kafka.javaapi.producer Producer]
+           [kafka.producer ProducerConfig KeyedMessage]
            [kafka.message Message])
   (:use [clj-kafka.core :only (as-properties)]))
 
@@ -22,7 +22,7 @@
    topic   : a string
    msgs    : a single message, or sequence of messages to send"
   [^Producer producer ^String topic msgs]
-  (.send producer (ProducerData. topic msgs)))
+  (.send producer (map #(KeyedMessage. topic %) msgs)))
 
 
 (defprotocol ToMessage
