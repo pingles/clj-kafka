@@ -38,7 +38,6 @@
 
 (defn create-zookeeper
   [{:keys [port host snapshot-dir log-dir]}]
-  (println "Creating zookeeper: " host port snapshot-dir log-dir)
   (let [tick-time 500
         zk (ZooKeeperServer. (file snapshot-dir) (file log-dir) tick-time)]
     (doto (NIOServerCnxn$Factory. (InetSocketAddress. host port))
