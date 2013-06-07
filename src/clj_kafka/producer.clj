@@ -8,13 +8,13 @@
         [clojure.data.json :only (read-str)])
   (:require [zookeeper :as zk]))
 
-(defprotocol MessagePayload
+(defprotocol MessageValue
   "Converts message payloads to bytes"
-  (message-payload [x]))
+  (message-value [x]))
 
-(extend-protocol MessagePayload
-  (Class/forName "[B") (message-payload [bytes] bytes)
-  String (message-payload [s] (.getBytes ^String s)))
+(extend-protocol MessageValue
+  (Class/forName "[B") (message-value [bytes] bytes)
+  String (message-value [s] (.getBytes ^String s)))
 
 (defn producer
   "Creates a Producer. m is the configuration
@@ -28,7 +28,7 @@
 
 (defn send-message
   [^Producer producer ^String topic value]
-  (.send producer ^KeyedMessage (keyed-message topic (message-payload value))))
+  (.send producer ^KeyedMessage (keyed-message topic (message-value value))))
 
 (defn brokers
   "Get brokers from zookeeper"
