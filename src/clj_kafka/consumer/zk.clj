@@ -27,21 +27,9 @@
   [consumer]
   (.shutdown consumer))
 
-(defn- topic-map
-  [topics]
-  (apply hash-map (interleave topics
-                              (repeat (Integer/valueOf 1)))))
-
 (defn messages
   "Creates a sequence of messages from the given topics."
   [consumer topic]
   (let [[topic streams] (first (.createMessageStreams consumer {topic (Integer/valueOf 1)}))]
     (iterator-seq (.iterator (first streams)))))
 
-(defn topics
-  "Connects to Zookeeper to read the list of topics. Use the same config
-   as with consumer, uses the zk.connect value to connect to the client"
-  [config]
-  (with-resource [z (zk/connect (get config "zk.connect"))]
-    zk/close 
-    (sort (zk/children z "/brokers/topics"))))
