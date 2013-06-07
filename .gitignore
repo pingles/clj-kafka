@@ -8,3 +8,4 @@
 /.lein-deps-sum
 autodoc/**
 /target
+.lein-repl-history
