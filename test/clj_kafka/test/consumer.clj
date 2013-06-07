@@ -24,7 +24,7 @@
         zk/shutdown
         (send-message p "test" "Hello, world")
         (let [msgs (zk/messages c "test")
-              msg (to-clojure (first msgs))]
+              msg (first msgs)]
           (let [{:keys [topic offset partition key value]} msg]
             (is (= "test" topic))
             (is (= 0 offset))

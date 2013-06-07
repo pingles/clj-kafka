@@ -28,9 +28,18 @@
   [^ConsumerConnector consumer]
   (.shutdown consumer))
 
+(defn- topic-map
+  [topics]
+  (apply hash-map (interleave topics
+                              (repeat (Integer/valueOf 1)))))
+
 (defn messages
-  "Creates a sequence of messages from the given topics."
-  [^ConsumerConnector consumer topic]
-  (let [[topic streams] (first (.createMessageStreams consumer {topic (Integer/valueOf 1)}))]
-    (iterator-seq (.iterator ^KafkaStream (first streams)))))
+  "Creates a sequence of KafkaMessage messages from the given topics. Consumes
+   messages from a single stream."
+  [^ConsumerConnector consumer & topics]
+  (let [[queue-seq queue-put] (pipe)]
+    (doseq [[topic streams] (.createMessageStreams consumer (topic-map topics))]
+      (future (doseq [msg (iterator-seq (.iterator ^KafkaStream (first streams)))]
+                (queue-put (to-clojure msg)))))
+    queue-seq))
 
