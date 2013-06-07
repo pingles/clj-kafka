@@ -71,7 +71,7 @@
                          (deserialize [bytes] (when bytes
                                                 (String. bytes "UTF-8")))))
 
-(defmacro with-broker
+(defmacro with-test-broker
   "Creates an in-process broker that can be used to test against"
   [& body]
   `(do (FileUtils/deleteDirectory (file (tmp-dir)))

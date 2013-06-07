@@ -2,7 +2,7 @@
   (:use [clojure.test]
         [clj-kafka.core :only (with-resource to-clojure)]
         [clj-kafka.producer :only (producer send-message)]
-        [clj-kafka.test.utils :only (with-broker static-partitioner)])
+        [clj-kafka.test.utils :only (with-test-broker static-partitioner)])
   (:require [clj-kafka.consumer.zk :as zk]
             [clj-kafka.consumer.simple :as simp]))
 
@@ -15,7 +15,7 @@
 ;; can't map the contents for us. Instead, use to-clojure directly
 ;; here for now
 (deftest test-zookeeper-consumption
-  (with-broker
+  (with-test-broker
     (let [p (producer producer-config)] 
       (with-resource [c (zk/consumer {"zookeeper.connect" "localhost:2182"
                                       "group.id" "clj-kafka.test.consumer"
@@ -33,7 +33,7 @@
 
 
 (deftest test-simple-consumer
-  (with-broker
+  (with-test-broker
     (let [p (producer producer-config)
           c (simp/consumer "localhost" 9999 "simple-consumer")]
       (send-message p "test" "Hello, world")

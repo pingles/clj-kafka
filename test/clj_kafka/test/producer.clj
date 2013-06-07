@@ -2,7 +2,7 @@
   (:use [clojure.test]
         [clj-kafka.core]
         [clj-kafka.producer] :reload
-        [clj-kafka.test.utils :only (with-broker)])
+        [clj-kafka.test.utils :only (with-test-broker)])
   (:import [kafka.message Message]
            [kafka.producer KeyedMessage]))
 
@@ -11,6 +11,6 @@
                  (keyed-message "topic" "value"))))
 
 (deftest brokers-test
-  (with-broker
+  (with-test-broker
     (is (= [{:host "localhost", :jmx_port -1, :port 9999, :version 1}]
            (brokers {"zookeeper.connect" "localhost:2182"})))))
