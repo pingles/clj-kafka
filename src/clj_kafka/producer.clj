@@ -28,7 +28,7 @@
 
 (defn send-message
   [^Producer producer ^String topic value]
-  (.send producer ^KeyedMessage (keyed-message topic (message-payload value)))))
+  (.send producer ^KeyedMessage (keyed-message topic (message-payload value))))
 
 (defn brokers
   "Get brokers from zookeeper"
