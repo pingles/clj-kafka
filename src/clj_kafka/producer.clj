@@ -6,29 +6,18 @@
 
 (defn producer
   "Creates a Producer. m is the configuration
-   serializer.class : default is kafka.serializer.DefaultEncoder
-   zk.connect       : Zookeeper connection. e.g. localhost:2181 "
+   metadata.broker.list : \"server:port,server:port\""
   [m]
   ^Producer (Producer. (ProducerConfig. (as-properties m))))
 
-(defn message
-  "Creates a message with the specified payload.
-   payload : bytes for the message payload. e.g. (.getBytes \"hello, world\")"
-  [#^bytes payload]
-  (Message. payload))
+(defn keyed-message
+  ([topic value] (keyed-message topic nil value))
+  ([topic key value] (KeyedMessage. topic key value)))
 
-(defn send-messages
-  "Sends a message.
-   topic   : a string
-   msgs    : a single message, or sequence of messages to send"
-  [^Producer producer ^String topic msgs]
-  (.send producer (map #(KeyedMessage. topic %) msgs)))
+(defn send-message
+  [^Producer producer ^String topic value]
+  (println "Sending message ...")
+  (.send producer (keyed-message topic value))
+  (println "Sent message!"))
 
 
-(defprotocol ToMessage
-  "Protocol to be extended to convert types to encoded Message objects"
-  (to-message [x] "Creates a Message instance"))
-
-(extend-protocol ToMessage
-  String
-  (to-message [x] (message (.getBytes x))))

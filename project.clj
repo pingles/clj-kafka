@@ -8,8 +8,8 @@
                com.sun.jdmk/jmxtools
                com.sun.jmx/jmxri
                jline/jline
-               net.sf.jopt-simple/jopt-simple
-               junit/junit]
+               junit/junit
+               log4j/log4j]
   :profiles {:dev {:dependencies [[org.slf4j/slf4j-simple "1.6.1"]
                                   [org.slf4j/log4j-over-slf4j "1.6.1"]
                                   [commons-io/commons-io "2.4"]]}}

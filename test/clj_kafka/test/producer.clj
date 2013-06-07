@@ -2,10 +2,9 @@
   (:use [clojure.test]
         [clj-kafka.core]
         [clj-kafka.producer] :reload)
-  (:import [kafka.message Message]))
+  (:import [kafka.message Message]
+           [kafka.producer KeyedMessage]))
 
-(deftest creates-message-with-string-bytes
-  (is (instance? Message
-                 (to-message "Hello, world")))
-  (is (= "Hello, world"
-         (String. (:payload (to-clojure (to-message "Hello, world")))))))
+(deftest keyed-messages
+  (is (instance? KeyedMessage
+                 (keyed-message "topic" "value"))))
