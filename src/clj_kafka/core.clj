@@ -1,7 +1,7 @@
 (ns clj-kafka.core
   (:import [java.nio ByteBuffer]
            [java.util Properties]
-           [kafka.message MessageAndMetadata Message]
+           [kafka.message MessageAndMetadata MessageAndOffset Message]
            [java.util.concurrent LinkedBlockingQueue]))
 
 (defrecord KafkaMessage [topic offset partition key value])
@@ -26,6 +26,11 @@
 (extend-protocol ToClojure
   MessageAndMetadata
   (to-clojure [x] (KafkaMessage. (.topic x) (.offset x) (.partition x) (.key x) (.message x)))
+
+  MessageAndOffset
+  (to-clojure [x] (let [offset (.offset x)
+                        msg (.message x)]
+                    (KafkaMessage. nil offset nil (.key msg) (to-clojure (.payload msg)))))
   
   ByteBuffer
   (to-clojure [x] (let [b (byte-array (.remaining x))]
