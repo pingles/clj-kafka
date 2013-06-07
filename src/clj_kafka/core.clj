@@ -1,7 +1,7 @@
 (ns clj-kafka.core
   (:import [java.nio ByteBuffer]
            [java.util Properties]
-           [kafka.message MessageAndMetadata MessageAndOffset Message]
+           [kafka.message MessageAndMetadata MessageAndOffset]
            [java.util.concurrent LinkedBlockingQueue]))
 
 (defrecord KafkaMessage [topic offset partition key value])
@@ -35,12 +35,7 @@
   ByteBuffer
   (to-clojure [x] (let [b (byte-array (.remaining x))]
                     (.get x b)
-                    b))
-  Message
-  (to-clojure [x] {:crc (.checksum x)
-                   :payload (to-clojure (.payload x))
-                   :size (.size x)
-                   :compression (keyword (.. x compressionCodec name))}))
+                    b)))
 
 (defn pipe
   "Returns a vector containing a sequence that will read from the
