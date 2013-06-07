@@ -1,5 +1,6 @@
 (ns clj-kafka.consumer.zk
-  (:import [kafka.consumer ConsumerConfig Consumer])
+  (:import [kafka.consumer ConsumerConfig Consumer KafkaStream]
+           [kafka.javaapi.consumer ConsumerConnector])
   (:use [clj-kafka.core :only (as-properties to-clojure with-resource pipe)])
   (:require [zookeeper :as zk]))
 
@@ -24,12 +25,12 @@
 
 (defn shutdown
   "Closes the connection to Zookeeper and stops consuming messages."
-  [consumer]
+  [^ConsumerConnector consumer]
   (.shutdown consumer))
 
 (defn messages
   "Creates a sequence of messages from the given topics."
-  [consumer topic]
+  [^ConsumerConnector consumer topic]
   (let [[topic streams] (first (.createMessageStreams consumer {topic (Integer/valueOf 1)}))]
-    (iterator-seq (.iterator (first streams)))))
+    (iterator-seq (.iterator ^KafkaStream (first streams)))))
 
