@@ -16,7 +16,7 @@
   "Creates a Producer. m is the configuration
    metadata.broker.list : \"server:port,server:port\""
   [m]
-  ^Producer (Producer. (ProducerConfig. (as-properties m))))
+  (Producer. (ProducerConfig. (as-properties m))))
 
 (defn keyed-message
   ([topic value] (keyed-message topic nil value))
@@ -24,4 +24,4 @@
 
 (defn send-message
   [^Producer producer ^String topic value]
-  (.send producer (keyed-message topic (message-payload value))))
+  (.send producer ^KeyedMessage (keyed-message topic (message-payload value))))
