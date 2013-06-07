@@ -12,7 +12,7 @@
 
 (defn tmp-dir
   [& parts]
-  (.getPath (apply file (System/getProperty "java.io.tmpdir") "clj-kafka" (str (System/currentTimeMillis)) parts)))
+  (.getPath (apply file (System/getProperty "java.io.tmpdir") "clj-kafka" parts)))
 
 (def zk-config {:host "127.0.0.1"
                 :port 2182
@@ -82,4 +82,5 @@
        (wait-until-initialised kafka# "test"))
      (try ~@body
           (finally (do (.shutdown kafka#)
-                       (.shutdown zk#))))))
+                       (.shutdown zk#)
+                       (FileUtils/deleteDirectory (file (tmp-dir))))))))
