@@ -1,8 +1,12 @@
 (ns clj-kafka.producer
   (:import [kafka.javaapi.producer Producer]
            [kafka.producer ProducerConfig KeyedMessage]
-           [kafka.message Message])
-  (:use [clj-kafka.core :only (as-properties)]))
+           [kafka.message Message]
+           [org.I0Itec.zkclient ZkClient]
+           [kafka.utils ZkUtils])
+  (:use [clj-kafka.core :only (as-properties with-resource)]
+        [clojure.data.json :only (read-str)])
+  (:require [zookeeper :as zk]))
 
 (defprotocol MessagePayload
   "Converts message payloads to bytes"
@@ -24,4 +28,15 @@
 
 (defn send-message
   [^Producer producer ^String topic value]
-  (.send producer ^KeyedMessage (keyed-message topic (message-payload value))))
+  (.send producer ^KeyedMessage (keyed-message topic (message-payload value)))))
+
+(defn brokers
+  "Get brokers from zookeeper"
+  [m]
+  (with-resource [z (zk/connect (get m "zookeeper.connect"))]
+    zk/close
+    (doall (map (comp #(read-str % :key-fn keyword)
+                      #(String. %)
+                      :data
+                      #(zk/data z (str "/brokers/ids/" %)))
+                (zk/children z "/brokers/ids")))))
