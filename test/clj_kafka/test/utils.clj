@@ -74,13 +74,15 @@
 (defmacro with-broker
   "Creates an in-process broker that can be used to test against"
   [& body]
-  `(let [zk# (create-zookeeper ~zk-config)
-         kafka# (create-broker)]
-     (.startup kafka#)
-     (let [zk-client# (ZkClient. "127.0.0.1:2182" 500 500 string-serializer)]
-       (create-topic zk-client# "test")
-       (wait-until-initialised kafka# "test"))
-     (try ~@body
-          (finally (do (.shutdown kafka#)
-                       (.shutdown zk#)
-                       (FileUtils/deleteDirectory (file (tmp-dir))))))))
+  `(do (FileUtils/deleteDirectory (file (tmp-dir)))
+       (let [zk# (create-zookeeper ~zk-config)
+             kafka# (create-broker)]
+         (.startup kafka#)
+         (let [zk-client# (ZkClient. "127.0.0.1:2182" 500 500 string-serializer)]
+           (create-topic zk-client# "test")
+           (wait-until-initialised kafka# "test"))
+         (try ~@body
+              (finally (do (.shutdown kafka#)
+                           (.shutdown zk#)
+                           (FileUtils/deleteDirectory (file (tmp-dir))))))))
+  )
