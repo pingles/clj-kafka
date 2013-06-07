@@ -10,7 +10,7 @@
 ;; Figure out why zk/messages can return the iterator sequence but
 ;; can't map the contents for us. Instead, use to-clojure directly
 ;; here for now
-(deftest test-sending-string-message
+(deftest test-zookeeper-consumption
   (with-broker
     (let [p (producer {"metadata.broker.list" "localhost:9999"
                        "serializer.class" "kafka.serializer.DefaultEncoder"
