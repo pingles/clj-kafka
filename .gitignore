@@ -9,3 +9,4 @@
 autodoc/**
 /target
 .lein-repl-history
+/tmp
