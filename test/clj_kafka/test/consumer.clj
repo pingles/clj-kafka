@@ -10,10 +10,6 @@
                       "serializer.class" "kafka.serializer.DefaultEncoder"
                       "partitioner.class" "kafka.producer.DefaultPartitioner"})
 
-;; TODO
-;; Figure out why zk/messages can return the iterator sequence but
-;; can't map the contents for us. Instead, use to-clojure directly
-;; here for now
 (deftest test-zookeeper-consumption
   (with-test-broker
     (let [p (producer producer-config)] 
@@ -23,7 +19,7 @@
                                       "auto.commit.enable" "false"})]
         zk/shutdown
         (send-message p "test" "Hello, world")
-        (let [msgs (zk/messages c "test")
+        (let [msgs (zk/messages c ["test"])
               msg (first msgs)]
           (let [{:keys [topic offset partition key value]} msg]
             (is (= "test" topic))

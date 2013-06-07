@@ -35,9 +35,15 @@
 
 (defn messages
   "Creates a sequence of KafkaMessage messages from the given topics. Consumes
-   messages from a single stream."
-  [^ConsumerConnector consumer & topics]
-  (let [[queue-seq queue-put] (pipe)]
+   messages from a single stream. topics is a collection of topics to consume
+   from.
+   Optional: queue-capacity. Can be used to limit number of messages held in
+   queue before they've been dequeued in the returned sequence. Defaults to
+   Integer/MAX_VALUE but can be changed if your messages are particularly large
+   and consumption is slow."
+  [^ConsumerConnector consumer topics & {:keys [queue-capacity]
+                                         :or   {queue-capacity (Integer/MAX_VALUE)}}]
+  (let [[queue-seq queue-put] (pipe queue-capacity)]
     (doseq [[topic streams] (.createMessageStreams consumer (topic-map topics))]
       (future (doseq [msg (iterator-seq (.iterator ^KafkaStream (first streams)))]
                 (queue-put (to-clojure msg)))))
