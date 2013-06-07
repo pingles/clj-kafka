@@ -35,11 +35,8 @@
 (defn messages
   "Creates a sequence of messages from the given topics."
   [consumer topic]
-  (let [[queue-seq queue-put] (pipe)]
-    (doseq [[topic streams] (.createMessageStreams consumer {topic (Integer/valueOf 1)})]
-      (future (doseq [msg (iterator-seq (.iterator (first streams)))]
-                (queue-put msg))))
-    queue-seq))
+  (let [[topic streams] (first (.createMessageStreams consumer {topic (Integer/valueOf 1)}))]
+    (iterator-seq (.iterator (first streams)))))
 
 (defn topics
   "Connects to Zookeeper to read the list of topics. Use the same config

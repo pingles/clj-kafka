@@ -16,8 +16,5 @@
 
 (defn send-message
   [^Producer producer ^String topic value]
-  (println "Sending message ...")
-  (.send producer (keyed-message topic value))
-  (println "Sent message!"))
-
+  (.send producer (keyed-message topic value)))
 
