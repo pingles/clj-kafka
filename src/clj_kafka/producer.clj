@@ -6,8 +6,7 @@
 
 (defn producer
   "Creates a Producer. m is the configuration
-   serializer.class : default is kafka.serializer.DefaultEncoder
-   zk.connect       : Zookeeper connection. e.g. localhost:2181 "
+   metadata.broker.list: host1:port1,host1:port2"
   [m]
   ^Producer (Producer. (ProducerConfig. (as-properties m))))
 
@@ -17,12 +16,16 @@
   [#^bytes payload]
   (Message. payload))
 
-(defn send-messages
+(defn- keyed-message
+  [^String topic ^Message message]
+  (KeyedMessage. topic nil message))
+
+(defn send-message
   "Sends a message.
    topic   : a string
    msgs    : a single message, or sequence of messages to send"
-  [^Producer producer ^String topic msgs]
-  (.send producer (map #(KeyedMessage. topic %) msgs)))
+  [^Producer producer ^String topic ^Message message]
+  (.send producer (keyed-message topic message)))
 
 
 (defprotocol ToMessage
