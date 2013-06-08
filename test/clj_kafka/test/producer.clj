@@ -11,6 +11,8 @@
                  (keyed-message "topic" "value"))))
 
 (deftest brokers-test
-  (with-test-broker
+  (with-test-broker {:zookeeper-port 2182
+                     :kafka-port 9999
+                     :topic "test"}
     (is (= [{:host "localhost", :jmx_port -1, :port 9999, :version 1}]
            (brokers {"zookeeper.connect" "localhost:2182"})))))

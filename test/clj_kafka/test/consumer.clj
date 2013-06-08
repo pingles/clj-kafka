@@ -2,7 +2,7 @@
   (:use [clojure.test]
         [clj-kafka.core :only (with-resource to-clojure)]
         [clj-kafka.producer :only (producer send-message)]
-        [clj-kafka.test.utils :only (with-test-broker static-partitioner)])
+        [clj-kafka.test.utils :only (with-test-broker)])
   (:require [clj-kafka.consumer.zk :as zk]
             [clj-kafka.consumer.simple :as simp]))
 
@@ -11,7 +11,9 @@
                       "partitioner.class" "kafka.producer.DefaultPartitioner"})
 
 (deftest test-zookeeper-consumption
-  (with-test-broker
+  (with-test-broker {:zookeeper-port 2182
+                     :kafka-port 9999
+                     :topic "test"}
     (let [p (producer producer-config)] 
       (with-resource [c (zk/consumer {"zookeeper.connect" "localhost:2182"
                                       "group.id" "clj-kafka.test.consumer"
@@ -29,7 +31,9 @@
 
 
 (deftest test-simple-consumer
-  (with-test-broker
+  (with-test-broker {:zookeeper-port 2182
+                     :kafka-port 9999
+                     :topic "test"}
     (let [p (producer producer-config)
           c (simp/consumer "localhost" 9999 "simple-consumer")]
       (send-message p "test" "Hello, world")

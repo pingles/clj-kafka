@@ -14,44 +14,30 @@
   [& parts]
   (.getPath (apply file (System/getProperty "java.io.tmpdir") "clj-kafka" parts)))
 
-(def zk-config {:host "127.0.0.1"
-                :port 2182
-                :snapshot-dir (tmp-dir "zookeeper-snapshot")
-                :log-dir (tmp-dir "zookeeper-log")})
-
-(def broker-config (let [{:keys [host port]} zk-config]
-                     {"broker.id" "0"
-                      "port" "9999"
-                      "host.name" "localhost"
-                      "zookeeper.connect" (str host ":" port)
-                      "enable.zookeeper" "true"
-                      "log.flush.interval.messages" "1"
-                      "auto.create.topics.enabled" "true"
-                      "log.dir" (.getAbsolutePath (file (tmp-dir "kafka-log")))}))
-
-
-
 (def system-time (proxy [kafka.utils.Time] []
                    (milliseconds [] (System/currentTimeMillis))
                    (nanoseconds [] (System/nanoTime))
                    (sleep [ms] (Thread/sleep ms))))
 
-(def static-partitioner (proxy [kafka.producer.Partitioner] []
-                          (partition [data number-of-partitions])))
-
-
-
 ;; enable.zookeeper doesn't seem to be used- check it actually has an effect
 (defn create-broker
-  []
-  (let [config (KafkaConfig. (as-properties broker-config))]
-    (KafkaServer. config system-time)))
+  [{:keys [kafka-port]}]
+  (let [base-config {"broker.id" "0"
+                     "port" "9999"
+                     "host.name" "localhost"
+                     "zookeeper.connect" "127.0.0.1:2182"
+                     "enable.zookeeper" "true"
+                     "log.flush.interval.messages" "1"
+                     "auto.create.topics.enabled" "true"
+                     "log.dir" (.getAbsolutePath (file (tmp-dir "kafka-log")))}]
+    (KafkaServer. (KafkaConfig. (as-properties (assoc base-config "port" (str kafka-port))))
+                  system-time)))
 
 (defn create-zookeeper
-  [{:keys [port host snapshot-dir log-dir]}]
+  [{:keys [zookeeper-port]}]
   (let [tick-time 500
-        zk (ZooKeeperServer. (file snapshot-dir) (file log-dir) tick-time)]
-    (doto (NIOServerCnxn$Factory. (InetSocketAddress. host port))
+        zk (ZooKeeperServer. (file (tmp-dir "zookeeper-snapshot")) (file (tmp-dir "zookeeper-log")) tick-time)]
+    (doto (NIOServerCnxn$Factory. (InetSocketAddress. "127.0.0.1" zookeeper-port))
       (.startup zk))))
 
 (defn wait-until-initialised
@@ -73,14 +59,15 @@
 
 (defmacro with-test-broker
   "Creates an in-process broker that can be used to test against"
-  [& body]
+  [config & body]
   `(do (FileUtils/deleteDirectory (file (tmp-dir)))
-       (let [zk# (create-zookeeper ~zk-config)
-             kafka# (create-broker)]
+       (let [zk# (create-zookeeper ~config)
+             kafka# (create-broker ~config)
+             topic# (:topic ~config)]
          (.startup kafka#)
          (let [zk-client# (ZkClient. "127.0.0.1:2182" 500 500 string-serializer)]
-           (create-topic zk-client# "test")
-           (wait-until-initialised kafka# "test"))
+           (create-topic zk-client# topic#)
+           (wait-until-initialised kafka# topic#))
          (try ~@body
               (finally (do (.shutdown kafka#)
                            (.shutdown zk#)
