@@ -71,5 +71,4 @@
          (try ~@body
               (finally (do (.shutdown kafka#)
                            (.shutdown zk#)
-                           (FileUtils/deleteDirectory (file (tmp-dir))))))))
-  )
+                           (FileUtils/deleteDirectory (file (tmp-dir)))))))))
