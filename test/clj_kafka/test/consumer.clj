@@ -10,10 +10,12 @@
                       "serializer.class" "kafka.serializer.DefaultEncoder"
                       "partitioner.class" "kafka.producer.DefaultPartitioner"})
 
+(def test-broker-config {:zookeeper-port 2182
+                         :kafka-port 9999
+                         :topic "test"})
+
 (deftest test-zookeeper-consumption
-  (with-test-broker {:zookeeper-port 2182
-                     :kafka-port 9999
-                     :topic "test"}
+  (with-test-broker test-broker-config
     (let [p (producer producer-config)] 
       (with-resource [c (zk/consumer {"zookeeper.connect" "localhost:2182"
                                       "group.id" "clj-kafka.test.consumer"
@@ -31,9 +33,7 @@
 
 
 (deftest test-simple-consumer
-  (with-test-broker {:zookeeper-port 2182
-                     :kafka-port 9999
-                     :topic "test"}
+  (with-test-broker test-broker-config
     (let [p (producer producer-config)
           c (simp/consumer "localhost" 9999 "simple-consumer")]
       (send-message p "test" "Hello, world")

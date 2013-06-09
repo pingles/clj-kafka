@@ -44,8 +44,7 @@
   [kafka-server topic]
   (let [topic-and-partition (TopicAndPartition. topic 0)]
     (while (not (.. kafka-server apis leaderCache keySet (contains topic-and-partition)))
-      (do (println "Sleeping for metadata propagation")
-          (Thread/sleep 500)))))
+      (Thread/sleep 500))))
 
 (defn create-topic
   [zk-client topic & {:keys [partitions replicas]
