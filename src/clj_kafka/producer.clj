@@ -22,13 +22,13 @@
   [m]
   (Producer. (ProducerConfig. (as-properties m))))
 
-(defn keyed-message
-  ([topic value] (keyed-message topic nil value))
+(defn message
+  ([topic value] (message topic nil value))
   ([topic key value] (KeyedMessage. topic key value)))
 
 (defn send-message
-  [^Producer producer ^String topic value]
-  (.send producer ^KeyedMessage (keyed-message topic (message-value value))))
+  [^Producer producer ^KeyedMessage message]
+  (.send producer message))
 
 (defn brokers
   "Get brokers from zookeeper"

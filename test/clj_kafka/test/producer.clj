@@ -6,9 +6,9 @@
   (:import [kafka.message Message]
            [kafka.producer KeyedMessage]))
 
-(deftest keyed-messages
+(deftest messages
   (is (instance? KeyedMessage
-                 (keyed-message "topic" "value"))))
+                 (message "topic" "value"))))
 
 (deftest brokers-test
   (with-test-broker {:zookeeper-port 2182

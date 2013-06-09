@@ -1,7 +1,7 @@
 (ns clj-kafka.test.consumer
   (:use [clojure.test]
         [clj-kafka.core :only (with-resource to-clojure)]
-        [clj-kafka.producer :only (producer send-message)]
+        [clj-kafka.producer :only (producer send-message message message-value)]
         [clj-kafka.test.utils :only (with-test-broker)])
   (:require [clj-kafka.consumer.zk :as zk]
             [clj-kafka.consumer.simple :as simp]))
@@ -15,26 +15,39 @@
                          :topic "test"})
 
 (deftest test-zookeeper-consumption
-  (with-test-broker test-broker-config
-    (let [p (producer producer-config)] 
-      (with-resource [c (zk/consumer {"zookeeper.connect" "localhost:2182"
-                                      "group.id" "clj-kafka.test.consumer"
-                                      "auto.offset.reset" "smallest"
-                                      "auto.commit.enable" "false"})]
-        zk/shutdown
-        (send-message p "test" "Hello, world")
-        (let [{:keys [topic offset partition key value]} (first (zk/messages c ["test"]))]
-          (is (= "test" topic))
-          (is (= 0 offset))
-          (is (= 0 partition))
-          (is (= "Hello, world" (String. value "UTF-8"))))))))
+  (let [consumer-config {"zookeeper.connect" "localhost:2182"
+                         "group.id" "clj-kafka.test.consumer"
+                         "auto.offset.reset" "smallest"
+                         "auto.commit.enable" "false"}]
+    (testing "Sending single message"
+      (with-test-broker test-broker-config
+        (let [p (producer producer-config)] 
+          (with-resource [c (zk/consumer consumer-config)]
+            zk/shutdown
+            (send-message p (message "test" (message-value "Hello, world")))
+            (let [{:keys [topic offset partition key value]} (first (zk/messages c ["test"]))]
+              (is (= "test" topic))
+              (is (= 0 offset))
+              (is (= 0 partition))
+              (is (= "Hello, world" (String. value "UTF-8"))))))))
+    (testing "Sending multiple messages"
+      (with-test-broker test-broker-config
+        (let [p (producer producer-config)] 
+          (with-resource [c (zk/consumer consumer-config)]
+            zk/shutdown
+            (send-message p (message "test" (message-value "Hello, world")))
+            (let [{:keys [topic offset partition key value]} (first (zk/messages c ["test"]))]
+              (is (= "test" topic))
+              (is (= 0 offset))
+              (is (= 0 partition))
+              (is (= "Hello, world" (String. value "UTF-8"))))))))))
 
 
 (deftest test-simple-consumer
   (with-test-broker test-broker-config
     (let [p (producer producer-config)
           c (simp/consumer "localhost" 9999 "simple-consumer")]
-      (send-message p "test" "Hello, world")
+      (send-message p (message "test" (message-value "Hello, world")))
       (let [msgs (simp/messages c
                                 "clj-kafka.test.simple-consumer"
                                 "test"
