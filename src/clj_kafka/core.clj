@@ -28,14 +28,13 @@
   (to-clojure [x] (KafkaMessage. (.topic x) (.offset x) (.partition x) (.key x) (.message x)))
 
   MessageAndOffset
-  (to-clojure [x] (let [offset (.offset x)
-                        msg (.message x)]
-                    (KafkaMessage. nil offset nil (.key msg) (to-clojure (.payload msg)))))
-  
-  ByteBuffer
-  (to-clojure [x] (let [b (byte-array (.remaining x))]
-                    (.get x b)
-                    b)))
+  (to-clojure [x]
+    (letfn [(byte-buffer-bytes [bb] (let [b (byte-array (.remaining bb))]
+                                      (.get bb b)
+                                      b))]
+      (let [offset (.offset x)
+            msg (.message x)]
+        (KafkaMessage. nil offset nil (.key msg) (byte-buffer-bytes (.payload msg)))))))
 
 (defn pipe
   "Returns a vector containing a sequence that will read from the
