@@ -8,14 +8,6 @@
         [clojure.data.json :only (read-str)])
   (:require [zookeeper :as zk]))
 
-(defprotocol MessageValue
-  "Converts message payloads to bytes"
-  (message-value [x]))
-
-(extend-protocol MessageValue
-  (Class/forName "[B") (message-value [bytes] bytes)
-  String (message-value [s] (.getBytes ^String s)))
-
 (defn producer
   "Creates a Producer. m is the configuration
    metadata.broker.list : \"server:port,server:port\""
