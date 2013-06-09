@@ -22,6 +22,10 @@
   [^Producer producer ^KeyedMessage message]
   (.send producer message))
 
+(defn send-messages
+  [^Producer producer messages]
+  (.send producer messages))
+
 (defn brokers
   "Get brokers from zookeeper"
   [m]
