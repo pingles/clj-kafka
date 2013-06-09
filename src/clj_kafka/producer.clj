@@ -3,7 +3,8 @@
            [kafka.producer ProducerConfig KeyedMessage]
            [kafka.message Message]
            [org.I0Itec.zkclient ZkClient]
-           [kafka.utils ZkUtils])
+           [kafka.utils ZkUtils]
+           [java.util List])
   (:use [clj-kafka.core :only (as-properties with-resource)]
         [clojure.data.json :only (read-str)])
   (:require [zookeeper :as zk]))
@@ -23,7 +24,7 @@
   (.send producer message))
 
 (defn send-messages
-  [^Producer producer messages]
+  [^Producer producer ^List messages]
   (.send producer messages))
 
 (defn brokers
@@ -32,7 +33,7 @@
   (with-resource [z (zk/connect (get m "zookeeper.connect"))]
     zk/close
     (doall (map (comp #(read-str % :key-fn keyword)
-                      #(String. %)
+                      #(String. ^bytes %)
                       :data
                       #(zk/data z (str "/brokers/ids/" %)))
                 (zk/children z "/brokers/ids")))))

@@ -29,7 +29,7 @@
 
   MessageAndOffset
   (to-clojure [x]
-    (letfn [(byte-buffer-bytes [bb] (let [b (byte-array (.remaining bb))]
+    (letfn [(byte-buffer-bytes [^ByteBuffer bb] (let [b (byte-array (.remaining bb))]
                                       (.get bb b)
                                       b))]
       (let [offset (.offset x)
