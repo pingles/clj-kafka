@@ -28,7 +28,7 @@
                      "zookeeper.connect" "127.0.0.1:2182"
                      "enable.zookeeper" "true"
                      "log.flush.interval.messages" "1"
-                     "auto.create.topics.enabled" "true"
+                     "auto.create.topics.enable" "true"
                      "log.dir" (.getAbsolutePath (file (tmp-dir "kafka-log")))}]
     (KafkaServer. (KafkaConfig. (as-properties (assoc base-config "port" (str kafka-port))))
                   system-time)))

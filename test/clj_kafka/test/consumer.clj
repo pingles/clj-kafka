@@ -23,13 +23,11 @@
                                       "auto.commit.enable" "false"})]
         zk/shutdown
         (send-message p "test" "Hello, world")
-        (let [msgs (zk/messages c ["test"])
-              msg (first msgs)]
-          (let [{:keys [topic offset partition key value]} msg]
-            (is (= "test" topic))
-            (is (= 0 offset))
-            (is (= 0 partition))
-            (is (= "Hello, world" (String. value "UTF-8")))))))))
+        (let [{:keys [topic offset partition key value]} (first (zk/messages c ["test"]))]
+          (is (= "test" topic))
+          (is (= 0 offset))
+          (is (= 0 partition))
+          (is (= "Hello, world" (String. value "UTF-8"))))))))
 
 
 (deftest test-simple-consumer
