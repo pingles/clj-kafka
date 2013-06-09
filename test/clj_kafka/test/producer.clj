@@ -1,18 +1,16 @@
 (ns clj-kafka.test.producer
-  (:use [clojure.test]
+  (:use [expectations]
         [clj-kafka.core]
-        [clj-kafka.producer] :reload
+        [clj-kafka.producer]
         [clj-kafka.test.utils :only (with-test-broker)])
   (:import [kafka.message Message]
            [kafka.producer KeyedMessage]))
 
-(deftest messages
-  (is (instance? KeyedMessage
-                 (message "topic" "value"))))
+(expect KeyedMessage (message "topic" "value"))
 
-(deftest brokers-test
-  (with-test-broker {:zookeeper-port 2182
-                     :kafka-port 9999
-                     :topic "test"}
-    (is (= [{:host "localhost", :jmx_port -1, :port 9999, :version 1}]
-           (brokers {"zookeeper.connect" "localhost:2182"})))))
+(given (with-test-broker {:zookeeper-port 2182
+                          :kafka-port 9999
+                          :topic "test"}
+         (brokers {"zookeeper.connect" "127.0.0.1:2182"}))
+       (expect count 1
+               first {:host "localhost", :jmx_port -1, :port 9999, :version 1}))
