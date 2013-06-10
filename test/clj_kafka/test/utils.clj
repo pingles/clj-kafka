@@ -21,11 +21,11 @@
 
 ;; enable.zookeeper doesn't seem to be used- check it actually has an effect
 (defn create-broker
-  [{:keys [kafka-port]}]
+  [{:keys [kafka-port zookeeper-port]}]
   (let [base-config {"broker.id" "0"
                      "port" "9999"
                      "host.name" "localhost"
-                     "zookeeper.connect" "127.0.0.1:2182"
+                     "zookeeper.connect" (str "127.0.0.1:" zookeeper-port)
                      "enable.zookeeper" "true"
                      "log.flush.interval.messages" "1"
                      "auto.create.topics.enable" "true"
@@ -64,7 +64,7 @@
              kafka# (create-broker ~config)
              topic# (:topic ~config)]
          (.startup kafka#)
-         (let [zk-client# (ZkClient. "127.0.0.1:2182" 500 500 string-serializer)]
+         (let [zk-client# (ZkClient. (str "127.0.0.1:" (:zookeeper-port ~config)) 500 500 string-serializer)]
            (create-topic zk-client# topic#)
            (wait-until-initialised kafka# topic#))
          (try ~@body
