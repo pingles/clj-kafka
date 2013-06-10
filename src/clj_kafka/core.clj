@@ -3,7 +3,7 @@
            [java.util Properties]
            [kafka.message MessageAndMetadata MessageAndOffset]
            [java.util.concurrent LinkedBlockingQueue]
-           [kafka.javaapi PartitionMetadata TopicMetadata TopicMetadataResponse]
+           [kafka.javaapi OffsetResponse PartitionMetadata TopicMetadata TopicMetadataResponse]
            [kafka.cluster Broker]))
 
 (defrecord KafkaMessage [topic offset partition key value])

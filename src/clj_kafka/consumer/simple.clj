@@ -1,8 +1,10 @@
 (ns clj-kafka.consumer.simple
   (:use [clj-kafka.core :only (to-clojure)])
   (:import [kafka.javaapi.consumer SimpleConsumer]
-           [kafka.api FetchRequestBuilder]
-           [kafka.javaapi TopicMetadataRequest]))
+           [kafka.api FetchRequestBuilder PartitionOffsetRequestInfo]
+           [kafka.javaapi OffsetRequest]
+           [kafka.javaapi TopicMetadataRequest]
+           [kafka.common TopicAndPartition]))
 
 (defn consumer
   "Create a consumer to connect to host and port. Port will
@@ -29,3 +31,10 @@
 
 (defn topic-meta-data [consumer topics]
   (to-clojure (.send consumer (TopicMetadataRequest. topics))))
+
+(defn latest-topic-offset [consumer topic partition]
+  (let [tp   (TopicAndPartition. topic partition)
+        pori (PartitionOffsetRequestInfo. -1 1)
+        hm    (java.util.HashMap. {tp pori})]
+    (let [response  (.getOffsetsBefore consumer (OffsetRequest. hm (kafka.api.OffsetRequest/CurrentVersion) "clj-kafka-id"))]
+      (first (.offsets response topic partition)))))

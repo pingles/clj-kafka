@@ -26,3 +26,8 @@
                                                                 :port 9999
                                                                 :broker-id 0}],
                                             :error-code 0}]}))
+
+(given (with-test-broker test-broker-config
+         (let [c (consumer "127.0.0.1" 9999 "simple-consumer")]
+           (latest-topic-offset c "test" 0)))
+       (expect identity 0))
