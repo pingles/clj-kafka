@@ -69,5 +69,6 @@
            (wait-until-initialised kafka# topic#))
          (try ~@body
               (finally (do (.shutdown kafka#)
+                           (.awaitShutdown kafka#)
                            (.shutdown zk#)
                            (FileUtils/deleteDirectory (file (tmp-dir)))))))))
