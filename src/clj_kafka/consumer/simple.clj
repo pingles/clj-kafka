@@ -1,7 +1,8 @@
 (ns clj-kafka.consumer.simple
   (:use [clj-kafka.core :only (to-clojure)])
   (:import [kafka.javaapi.consumer SimpleConsumer]
-           [kafka.api FetchRequestBuilder]))
+           [kafka.api FetchRequestBuilder]
+           [kafka.javaapi TopicMetadataRequest]))
 
 (defn consumer
   "Create a consumer to connect to host and port. Port will
@@ -25,3 +26,6 @@
     (iterator-seq (.iterator (.messageSet ^kafka.javaapi.FetchResponse (.fetch consumer ^kafka.api.FetchRequest fetch)
                                           topic
                                           partition)))))
+
+(defn topic-meta-data [consumer topics]
+  (to-clojure (.send consumer (TopicMetadataRequest. topics))))

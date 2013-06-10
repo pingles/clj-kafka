@@ -2,7 +2,9 @@
   (:import [java.nio ByteBuffer]
            [java.util Properties]
            [kafka.message MessageAndMetadata MessageAndOffset]
-           [java.util.concurrent LinkedBlockingQueue]))
+           [java.util.concurrent LinkedBlockingQueue]
+           [kafka.javaapi PartitionMetadata TopicMetadata TopicMetadataResponse]
+           [kafka.cluster Broker]))
 
 (defrecord KafkaMessage [topic offset partition key value])
 
@@ -34,7 +36,30 @@
                                       b))]
       (let [offset (.offset x)
             msg (.message x)]
-        (KafkaMessage. nil offset nil (.key msg) (byte-buffer-bytes (.payload msg)))))))
+        (KafkaMessage. nil offset nil (.key msg) (byte-buffer-bytes (.payload msg))))))
+
+  Broker
+  (to-clojure [x]
+    {:zookeeper-connect (.getZkString x)
+     :host (.host x)
+     :port (.port x)})
+
+  PartitionMetadata
+  (to-clojure [x]
+    {:partition-id (.partitionId x)
+     :leader (to-clojure (.leader x))
+     :replicas (map to-clojure (.replicas x))
+     :in-sync-replicas (map to-clojure (.isr x))
+     :error-code (.errorCode x)})
+
+  TopicMetadata
+  (to-clojure [x]
+    {:topic (.topic x)
+     :partition-metadata (map to-clojure (.partitionsMetadata x))})
+
+  TopicMetadataResponse
+  (to-clojure [x]
+    (map to-clojure (.topicsMetadata x))))
 
 (defn pipe
   "Returns a vector containing a sequence that will read from the
