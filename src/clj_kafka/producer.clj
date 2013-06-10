@@ -1,13 +1,8 @@
 (ns clj-kafka.producer
   (:import [kafka.javaapi.producer Producer]
            [kafka.producer ProducerConfig KeyedMessage]
-           [kafka.message Message]
-           [org.I0Itec.zkclient ZkClient]
-           [kafka.utils ZkUtils]
            [java.util List])
-  (:use [clj-kafka.core :only (as-properties with-resource)]
-        [clojure.data.json :only (read-str)])
-  (:require [zookeeper :as zk]))
+  (:use [clj-kafka.core :only (as-properties)]))
 
 (defn producer
   "Creates a Producer. m is the configuration
@@ -26,14 +21,3 @@
 (defn send-messages
   [^Producer producer ^List messages]
   (.send producer messages))
-
-(defn brokers
-  "Get brokers from zookeeper"
-  [m]
-  (with-resource [z (zk/connect (get m "zookeeper.connect"))]
-    zk/close
-    (doall (map (comp #(read-str % :key-fn keyword)
-                      #(String. ^bytes %)
-                      :data
-                      #(zk/data z (str "/brokers/ids/" %)))
-                (zk/children z "/brokers/ids")))))
