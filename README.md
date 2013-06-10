@@ -1,14 +1,14 @@
 # clj-kafka
 
-Simple Clojure interface to [Kafka](http://incubator.apache.org/kafka/).
+Clojure library for [Kafka](http://incubator.apache.org/kafka/).
 
-It's currently a snapshot only until things flesh out a little more. [API Documentation is also available](http://pingles.github.com/clj-kafka/).
+Current build status: [![Build Status](https://travis-ci.org/pingles/clj-kafka.png?branch=0.8)](https://travis-ci.org/pingles/clj-kafka)
 
-Note: Kafka binaries are not currently published to any public repositories. Additionally, the 0.8 release was [published as source](http://incubator.apache.org/kafka/downloads.html). This library uses [a build of the 0.8 incubator release published on Clojars](https://clojars.org/com.uswitch/kafka_2.9.2).
-
-Current build status: ![Build status](https://secure.travis-ci.org/pingles/clj-kafka.png)
+Development is against the unreleased 0.8 branch of Kafka. The protocols for 0.7 and 0.8 are incompatible so this will only work when connecting to a 0.8 cluster.
 
 ## Installing
+
+Given 0.8 is still unreleased we're pushing SNAPSHOT releases.
 
 Add the following to your [Leiningen](http://github.com/technomancy/leiningen) `project.clj`:
 
@@ -18,39 +18,23 @@ Add the following to your [Leiningen](http://github.com/technomancy/leiningen) `
 
 ## Usage
 
-clj-kafka currently only supports Kafka 0.8.
-
 ### Producer
 
-Allows batching of messages:
+Discovery of Kafka brokers from Zookeeper:
+
+```clj
+(brokers {"zookeeper.connect" "127.0.0.1:2181"}))
+;; ({:host "localhost", :jmx_port -1, :port 9999, :version 1})
+```
 
 ```clj
 (use 'clj-kafka.producer)
 
-(def p (producer {"zk.connect" "localhost:2181"}))
-(send-messages p "test" (->> ["message payload 1" "message payload 2"]
-                             (map #(.getBytes %))
-                             (map message)))
-```
+(def p (producer {"metadata.broker.list" "localhost:9999"
+                  "serializer.class" "kafka.serializer.DefaultEncoder"
+                  "partitioner.class" "kafka.producer.DefaultPartitioner"}))
 
-Or sending a single message:
-
-```clj
-(def p (producer {"zk.connect" "localhost:2181"}))
-(send-messages p "test" (message (.getBytes "payload")))
-```
-
-### SimpleConsumer
-
-```clj
-(use 'clj-kafka.consumer.simple)
-
-(def c (consumer "localhost" 9092))
-(def f (fetch "test" 0 0 4096))
-
-(messages c f)
-
-({:message {:crc 1513777821, :payload #<byte[] [B@3088890d>, :size 1089}, :offset 1093} {:message {:crc 4119364266, :payload #<byte[] [B@3088890d>, :size 968}, :offset 2065} {:message {:crc 3827222527, :payload #<byte[] [B@3088890d>, :size 1137}, :offset 3206})
+(send-message p (keyed-message "test" (.getBytes "this is my message")))
 ```
 
 ### Zookeeper Consumer
@@ -61,21 +45,20 @@ The Zookeeper consumer uses broker information contained within Zookeeper to con
 (use 'clj-kafka.consumer.zk)
 (use 'clj-kafka.core)
 
-(def config {"zookeeper.connect" "localhost:2181" 
-             "group.id"    "my-task-group"
-             "auto.offset.reset" "smallest"})
+(def config {"zookeeper.connect" "localhost:2182"
+             "group.id" "clj-kafka.consumer"
+             "auto.offset.reset" "smallest"
+             "auto.commit.enable" "false"})
 
 (with-resource [c (consumer config)]
   shutdown
-  (take 2 (messages c "test")))
-
-({:crc 3417370184, :payload #<byte[] [B@698b41da>, :size 22} {:crc 3417370184, :payload #<byte[] [B@698b41da>, :size 22} {:crc 960674935, :payload #<byte[] [B@698b41da>, :size 86} {:crc 3651343620, :payload #<byte[] [B@698b41da>, :size 20} {:crc 2012604996, :payload #<byte[] [B@698b41da>, :size 20})
+  (take 2 (messages c ["test"])))
 ```
 
 It's also now possible to consume messages from multiple topics at the same time. These are aggregated and returned as a single sequence:
 
 ```clojure
-(take 5 (messages c "test1" "test2"))
+(take 5 (messages c ["test1" "test2"]))
 ```
 
 ## License
