@@ -23,3 +23,10 @@
         :data
         String.
         Integer/valueOf)))
+
+(defn topics
+  "Get topics"
+  [m]
+  (with-resource [z (zk/connect (get m "zookeeper.connect"))]
+    zk/close
+    (zk/children z "/brokers/topics")))

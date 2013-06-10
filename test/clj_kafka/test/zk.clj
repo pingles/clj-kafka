@@ -7,11 +7,17 @@
              :kafka-port 9999
              :topic "test"})
 
+(def zk-connect {"zookeeper.connect" "127.0.0.1:2182"})
 (given (with-test-broker config
-         (brokers {"zookeeper.connect" "127.0.0.1:2182"}))
+         (brokers zk-connect))
        (expect count 1
                first {:host "localhost", :jmx_port -1, :port 9999, :version 1}))
 
 (given (with-test-broker config
-         (controller {"zookeeper.connect" "127.0.0.1:2182"}))
+         (controller zk-connect))
        (expect identity 0))
+
+(given (with-test-broker config
+         (topics zk-connect))
+       (expect count 1
+               first (:topic config)))
