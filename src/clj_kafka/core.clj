@@ -40,7 +40,7 @@
 
   Broker
   (to-clojure [x]
-    {:zookeeper-connect (.getZkString x)
+    {:connect (.getConnectionString x)
      :host (.host x)
      :port (.port x)
      :broker-id (.id x)})

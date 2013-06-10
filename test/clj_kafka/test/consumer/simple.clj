@@ -13,15 +13,15 @@
        (expect count 1
                first {:topic "test",
                       :partition-metadata [{:partition-id 0,
-                                            :leader {:zookeeper-connect "localhost:9999",
+                                            :leader {:connect "localhost:9999",
                                                      :host "localhost",
                                                      :port 9999
                                                      :broker-id 0},
-                                            :replicas [{:zookeeper-connect "localhost:9999",
+                                            :replicas [{:connect "localhost:9999",
                                                         :host "localhost",
                                                         :port 9999
                                                         :broker-id 0}],
-                                            :in-sync-replicas [{:zookeeper-connect "localhost:9999",
+                                            :in-sync-replicas [{:connect "localhost:9999",
                                                                 :host "localhost",
                                                                 :port 9999
                                                                 :broker-id 0}],
