@@ -42,7 +42,8 @@
   (to-clojure [x]
     {:zookeeper-connect (.getZkString x)
      :host (.host x)
-     :port (.port x)})
+     :port (.port x)
+     :broker-id (.id x)})
 
   PartitionMetadata
   (to-clojure [x]

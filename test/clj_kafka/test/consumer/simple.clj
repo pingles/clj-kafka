@@ -15,11 +15,14 @@
                       :partition-metadata [{:partition-id 0,
                                             :leader {:zookeeper-connect "localhost:9999",
                                                      :host "localhost",
-                                                     :port 9999},
+                                                     :port 9999
+                                                     :broker-id 0},
                                             :replicas [{:zookeeper-connect "localhost:9999",
                                                         :host "localhost",
-                                                        :port 9999}],
+                                                        :port 9999
+                                                        :broker-id 0}],
                                             :in-sync-replicas [{:zookeeper-connect "localhost:9999",
                                                                 :host "localhost",
-                                                                :port 9999}],
+                                                                :port 9999
+                                                                :broker-id 0}],
                                             :error-code 0}]}))
