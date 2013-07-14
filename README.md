@@ -6,6 +6,8 @@ It's currently a snapshot only until things flesh out a little more. [API Docume
 
 Note: Kafka binaries are not currently published to any public repositories. Additionally, the 0.7 release was [published as source](http://incubator.apache.org/kafka/downloads.html). This library uses [a build of the 0.7 incubator release published on Clojars](http://clojars.org/org.clojars.paul/core-kafka_2.8.0).
 
+Regarding Kafka 0.8, a working version of this library for Kafka 0.8 that is already used in production is in the [0.8 branch](https://github.com/pingles/clj-kafka/tree/0.8).
+
 Current build status: ![Build status](https://secure.travis-ci.org/pingles/clj-kafka.png)
 
 ## Installing
