@@ -1,5 +1,6 @@
 (ns clj-kafka.consumer.zk
-  (:import [kafka.consumer ConsumerConfig Consumer])
+  (:import [kafka.consumer ConsumerConfig Consumer KafkaStream]
+           [kafka.javaapi.consumer ConsumerConnector])
   (:use [clj-kafka.core :only (as-properties to-clojure with-resource pipe)])
   (:require [zookeeper :as zk]))
 
@@ -11,21 +12,20 @@
    (with-resource [c (consumer m)]
      shutdown
      (take 5 (messages c \"test\")))
-  
+
    Keys:
-   zk.connect             : host:port for Zookeeper. e.g: 127.0.0.1:2181
-   groupid                : consumer group. e.g. group1
-   zk.sessiontimeout.ms   : session timeout. e.g. 400
-   zk.synctime.ms         : Max time for how far a ZK follower can be behind a ZK leader. 200 ms
-   autocommit.interval.ms : the frequency that the consumed offsets are committed to zookeeper.
-   autocommit.enable      : if set to true, the consumer periodically commits to zookeeper the latest consumed offset of each partition"
+   zookeeper.connect             : host:port for Zookeeper. e.g: 127.0.0.1:2181
+   group.id                      : consumer group. e.g. group1
+   auto.offset.reset             : what to do if an offset is out of range, e.g. smallest, largest
+   auto.commit.interval.ms       : the frequency that the consumed offsets are committed to zookeeper.
+   auto.commit.enable            : if set to true, the consumer periodically commits to zookeeper the latest consumed offset of each partition"
   [m]
   (let [config (ConsumerConfig. (as-properties m))]
     (Consumer/createJavaConsumerConnector config)))
 
 (defn shutdown
   "Closes the connection to Zookeeper and stops consuming messages."
-  [consumer]
+  [^ConsumerConnector consumer]
   (.shutdown consumer))
 
 (defn- topic-map
@@ -34,18 +34,18 @@
                               (repeat (Integer/valueOf 1)))))
 
 (defn messages
-  "Creates a sequence of messages from the given topics."
-  [consumer & topics]
-  (let [[queue-seq queue-put] (pipe)]
+  "Creates a sequence of KafkaMessage messages from the given topics. Consumes
+   messages from a single stream. topics is a collection of topics to consume
+   from.
+   Optional: queue-capacity. Can be used to limit number of messages held in
+   queue before they've been dequeued in the returned sequence. Defaults to
+   Integer/MAX_VALUE but can be changed if your messages are particularly large
+   and consumption is slow."
+  [^ConsumerConnector consumer topics & {:keys [queue-capacity]
+                                         :or   {queue-capacity (Integer/MAX_VALUE)}}]
+  (let [[queue-seq queue-put] (pipe queue-capacity)]
     (doseq [[topic streams] (.createMessageStreams consumer (topic-map topics))]
-      (future (doseq [msg (iterator-seq (.iterator (first streams)))]
-                (queue-put (-> msg to-clojure (assoc :topic topic))))))
+      (future (doseq [msg (iterator-seq (.iterator ^KafkaStream (first streams)))]
+                (queue-put (to-clojure msg)))))
     queue-seq))
 
-(defn topics
-  "Connects to Zookeeper to read the list of topics. Use the same config
-   as with consumer, uses the zk.connect value to connect to the client"
-  [config]
-  (with-resource [z (zk/connect (get config "zk.connect"))]
-    zk/close 
-    (sort (zk/children z "/brokers/topics"))))

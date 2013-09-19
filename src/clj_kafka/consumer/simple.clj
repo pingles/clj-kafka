@@ -1,40 +1,39 @@
 (ns clj-kafka.consumer.simple
   (:use [clj-kafka.core :only (to-clojure)])
   (:import [kafka.javaapi.consumer SimpleConsumer]
-           [kafka.api FetchRequest OffsetRequest]))
+           [kafka.api FetchRequest FetchRequestBuilder PartitionOffsetRequestInfo]
+           [kafka.javaapi OffsetRequest TopicMetadataRequest FetchResponse]
+           [kafka.common TopicAndPartition]))
 
 (defn consumer
   "Create a consumer to connect to host and port. Port will
    normally be 9092."
-  [host port & {:keys [timeout buffer-size] :or {timeout 100000 buffer-size 10000}}]
-  (SimpleConsumer. host port timeout buffer-size))
+  [host ^Long port client-id & {:keys [^Long timeout ^Long buffer-size] :or {timeout 100000 buffer-size 10000}}]
+  (SimpleConsumer. host
+                   (Integer/valueOf port)
+                   (Integer/valueOf timeout)
+                   (Integer/valueOf buffer-size)
+                   client-id))
 
-(defn earliest-offset
-  "Retrieves the earliest offset available for topic and partition."
-  [consumer topic partition]
-  (long (first (.getOffsetsBefore consumer topic partition (OffsetRequest/EarliestTime) 1))))
-
-(defn latest-offsets
-  "Retrieves n most recent offsets for topic and partition."
-  [consumer topic partition n]
-  (map long (.getOffsetsBefore consumer topic partition (OffsetRequest/LatestTime) n)))
-
-(defn max-offset
-  [consumer topic partition]
-  (first (latest-offsets consumer topic partition 1)))
-
-(defn fetch
-  "Creates a request to retrieve a set of messages from the
-   specified topic.
-
-   Arguments:
-   partition: as specified when producing messages
-   offset: offset to start retrieval
-   max-size: number of bytes to retrieve"
-  [^String topic ^Integer partition ^Long offset ^Integer max-size]
-  (FetchRequest. topic partition offset max-size))
+(defn fetch-request
+  [client-id topic ^Long partition offset fetch-size]
+  (.build (doto (FetchRequestBuilder. )
+            (.clientId client-id)
+            (.addFetch topic (Integer/valueOf partition) offset fetch-size))))
 
 (defn messages
-  "Creates a sequence of messages from the given request."
-  [consumer request]
-  (map to-clojure (iterator-seq (.iterator (.fetch consumer request)))))
+  [^SimpleConsumer consumer client-id topic partition offset fetch-size]
+  (let [fetch (fetch-request client-id topic partition offset fetch-size)]
+    (map to-clojure (iterator-seq (.iterator (.messageSet ^FetchResponse (.fetch consumer ^FetchRequest fetch)
+                                                          topic
+                                                          partition))))))
+
+(defn topic-meta-data [consumer topics]
+  (to-clojure (.send consumer (TopicMetadataRequest. topics))))
+
+(defn latest-topic-offset [consumer topic partition]
+  (let [tp   (TopicAndPartition. topic partition)
+        pori (PartitionOffsetRequestInfo. -1 1)
+        hm    (java.util.HashMap. {tp pori})]
+    (let [response  (.getOffsetsBefore consumer (OffsetRequest. hm (kafka.api.OffsetRequest/CurrentVersion) "clj-kafka-id"))]
+      (first (.offsets response topic partition)))))
