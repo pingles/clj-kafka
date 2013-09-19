@@ -63,12 +63,13 @@
        (let [zk# (create-zookeeper ~config)
              kafka# (create-broker ~config)
              topic# (:topic ~config)]
-         (.startup kafka#)
-         (let [zk-client# (ZkClient. (str "127.0.0.1:" (:zookeeper-port ~config)) 500 500 string-serializer)]
-           (create-topic zk-client# topic#)
-           (wait-until-initialised kafka# topic#))
-         (try ~@body
-              (finally (do (.shutdown kafka#)
-                           (.awaitShutdown kafka#)
-                           (.shutdown zk#)
-                           (FileUtils/deleteDirectory (file (tmp-dir)))))))))
+         (try
+           (.startup kafka#)
+           (let [zk-client# (ZkClient. (str "127.0.0.1:" (:zookeeper-port ~config)) 500 500 string-serializer)]
+             (create-topic zk-client# topic#)
+             (wait-until-initialised kafka# topic#)
+             ~@body)
+           (finally (do (.shutdown kafka#)
+                        (.awaitShutdown kafka#)
+                        (.shutdown zk#)
+                        (FileUtils/deleteDirectory (file (tmp-dir)))))))))
