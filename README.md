@@ -13,7 +13,7 @@ Given 0.8 is still unreleased we're pushing SNAPSHOT releases.
 Add the following to your [Leiningen](http://github.com/technomancy/leiningen) `project.clj`:
 
 ```clj
-[clj-kafka "0.1.0-0.8-SNAPSHOT"]
+[clj-kafka "0.1.0-0.8-beta1"]
 ```
 
 ## Usage
