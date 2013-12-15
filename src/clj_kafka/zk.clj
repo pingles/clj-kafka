@@ -13,6 +13,10 @@
                       :data
                       #(zk/data z (str "/brokers/ids/" %)))
                 (zk/children z "/brokers/ids")))))
+                
+(defn- controller-broker-id
+  [^String zk-data]
+  (get (read-str zk-data) "brokerid"))
 
 (defn controller
   "Get leader node"
@@ -22,7 +26,7 @@
     (-> (zk/data z "/controller")
         :data
         String.
-        Integer/valueOf)))
+        controller-broker-id)))
 
 (defn topics
   "Get topics"

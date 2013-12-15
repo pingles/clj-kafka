@@ -10,8 +10,14 @@
 (def zk-connect {"zookeeper.connect" "127.0.0.1:2182"})
 (given (with-test-broker config
          (brokers zk-connect))
-       (expect count 1
-               first {:host "localhost", :jmx_port -1, :port 9999, :version 1}))
+       (expect count 1))
+
+(given (with-test-broker config
+         (first (brokers zk-connect)))
+       (expect :host "localhost"
+               :jmx_port -1
+               :port 9999
+               :version 1))
 
 (given (with-test-broker config
          (controller zk-connect))
