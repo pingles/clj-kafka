@@ -1,4 +1,4 @@
-(defproject clj-kafka/clj-kafka "0.1.1-0.8-beta1"
+(defproject clj-kafka/clj-kafka "0.1.2-0.8"
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [zookeeper-clj "0.9.3"]
