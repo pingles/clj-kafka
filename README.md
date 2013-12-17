@@ -11,7 +11,7 @@ Development is against the 0.8 release of Kafka. The protocols for 0.7 and 0.8 a
 Add the following to your [Leiningen](http://github.com/technomancy/leiningen) `project.clj`:
 
 ```clj
-[clj-kafka "0.2.1-0.8"]
+[clj-kafka "0.1.2-0.8"]
 ```
 
 ## Usage
@@ -32,7 +32,7 @@ Discovery of Kafka brokers from Zookeeper:
                   "serializer.class" "kafka.serializer.DefaultEncoder"
                   "partitioner.class" "kafka.producer.DefaultPartitioner"}))
 
-(send-message p (keyed-message "test" (.getBytes "this is my message")))
+(send-message p (message "test" (.getBytes "this is my message")))
 ```
 
 ### Zookeeper Consumer
