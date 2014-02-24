@@ -1,7 +1,7 @@
 (ns clj-kafka.consumer.zk
   (:import [kafka.consumer ConsumerConfig Consumer KafkaStream]
            [kafka.javaapi.consumer ConsumerConnector])
-  (:use [clj-kafka.core :only (as-properties to-clojure with-resource pipe)])
+  (:use [clj-kafka.core :only (as-properties to-clojure with-resource)])
   (:require [zookeeper :as zk]))
 
 (defn consumer
