@@ -1,9 +1,9 @@
-(defproject clj-kafka/clj-kafka "0.1.2-0.8"
+(defproject clj-kafka/clj-kafka "0.2.0-0.8"
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [zookeeper-clj "0.9.3"]
                  [org.clojure/data.json "0.2.2"]
-                 
+
                  ;; kafka and its related deps
                  [org.apache.kafka/kafka_2.10 "0.8.0"]
                  [org.apache.zookeeper/zookeeper "3.3.4"]
