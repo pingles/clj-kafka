@@ -23,6 +23,10 @@
   (fn [m]
     (String. (k m) "UTF-8")))
 
+(defn test-message
+  []
+  (message "test" (.getBytes "Hello, world")))
+
 (defn send-and-receive
   [messages]
   (with-test-broker test-broker-config
@@ -30,10 +34,9 @@
       zk/shutdown
       (let [p (producer producer-config)]
         (send-messages p messages)
-        (doall (take (count messages)
-                     (zk/messages c ["test"])))))))
+        (zk/messages c "test")))))
 
-(given (first (send-and-receive [(message "test" (.getBytes "Hello, world"))]))
+(given (first (send-and-receive [(test-message)]))
        (expect :topic "test"
                :offset 0
                :partition 0
