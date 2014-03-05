@@ -50,13 +50,7 @@ The Zookeeper consumer uses broker information contained within Zookeeper to con
 
 (with-resource [c (consumer config)]
   shutdown
-  (take 2 (messages c ["test"])))
-```
-
-It's also now possible to consume messages from multiple topics at the same time. These are aggregated and returned as a single sequence:
-
-```clojure
-(take 5 (messages c ["test1" "test2"]))
+  (take 2 (messages c "test")))
 ```
 
 ## License

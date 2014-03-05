@@ -11,3 +11,4 @@ autodoc/**
 .lein-repl-history
 /tmp
 /logs
+.nrepl-port
