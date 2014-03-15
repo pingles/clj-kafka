@@ -1,7 +1,7 @@
 (ns clj-kafka.test.consumer.zk
-  (:use [expectations]
+  (:use [clj-kafka.producer :only [producer send-messages message]]
+        [expectations :exclude [message]]
         [clj-kafka.core :only (with-resource to-clojure)]
-        [clj-kafka.producer :only (producer send-messages message)]
         [clj-kafka.test.utils :only (with-test-broker)])
   (:require [clj-kafka.consumer.zk :as zk]))
 
