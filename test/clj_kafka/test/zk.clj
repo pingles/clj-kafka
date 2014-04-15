@@ -12,6 +12,9 @@
          (brokers zk-connect))
        (expect count 1))
 
+(expect nil (broker-list []))
+(expect "localhost:2181" (broker-list [{:host "localhost" :port "2181"}]))
+
 (given (with-test-broker config
          (first (brokers zk-connect)))
        (expect :host "localhost"
