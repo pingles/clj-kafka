@@ -11,7 +11,7 @@ Development is against the 0.8 release of Kafka. The protocols for 0.7 and 0.8 a
 Add the following to your [Leiningen](http://github.com/technomancy/leiningen) `project.clj`:
 
 ```clj
-[clj-kafka "0.1.2-0.8"]
+[clj-kafka "0.2.0-0.8"]
 ```
 
 ## Usage
