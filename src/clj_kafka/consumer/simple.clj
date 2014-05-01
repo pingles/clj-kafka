@@ -31,9 +31,13 @@
 (defn topic-meta-data [consumer topics]
   (to-clojure (.send consumer (TopicMetadataRequest. topics))))
 
-(defn latest-topic-offset [consumer topic partition]
-  (let [tp   (TopicAndPartition. topic partition)
-        pori (PartitionOffsetRequestInfo. -1 1)
+(defn topic-offset [consumer topic partition offset-position]
+  (let [op   {:latest -1 :earliest -2}
+        tp   (TopicAndPartition. topic partition)
+        pori (PartitionOffsetRequestInfo. (offset-position op) 1)
         hm    (java.util.HashMap. {tp pori})]
     (let [response  (.getOffsetsBefore consumer (OffsetRequest. hm (kafka.api.OffsetRequest/CurrentVersion) "clj-kafka-id"))]
       (first (.offsets response topic partition)))))
+
+(defn latest-topic-offset [consumer topic partition]
+  (topic-offset consumer topic partition :latest))
