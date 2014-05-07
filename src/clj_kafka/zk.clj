@@ -44,3 +44,14 @@
   (with-resource [z (zk/connect (get m "zookeeper.connect"))]
     zk/close
     (zk/children z "/brokers/topics")))
+
+(defn partitions
+  "Returns a map of partitions and replica ids. e.g. {\"1\" [0], \"0\" [0]}"
+  [m topic]
+  (with-resource [z (zk/connect (get m "zookeeper.connect"))]
+    zk/close
+    (-> (zk/data z (str "/brokers/topics/" topic))
+        :data
+        String.
+        read-str
+        (get "partitions"))))
