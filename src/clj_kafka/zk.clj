@@ -82,4 +82,4 @@
         (zk/delete z path)
         (if-let [{:keys [version] :as m} (zk/exists z path)]
           (zk/set-data z path (.getBytes (str offset)) version)
-          (zk/create z path :persistent? true :data (.getBytes (str offset))))))))
+          (zk/create-all z path :persistent? true :data (.getBytes (str offset))))))))
