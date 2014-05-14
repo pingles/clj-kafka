@@ -10,7 +10,7 @@ Development is against the 0.8 release of Kafka. The protocols for 0.7 and 0.8 a
 
 Add the following to your [Leiningen](http://github.com/technomancy/leiningen) `project.clj`:
 
-![clj-kafka version](https://clojars.org/clj-kafka/latest-version.svg)
+![latest clj-kafka version](https://clojars.org/clj-kafka/latest-version.svg)
 
 ## Usage
 
