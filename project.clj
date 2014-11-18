@@ -5,9 +5,9 @@
                  [org.clojure/data.json "0.2.2"]
 
                  ;; kafka and its related deps
-                 [org.apache.kafka/kafka_2.10 "0.8.0"]
+                 [org.apache.kafka/kafka_2.10 "0.8.1.1"]
                  [org.apache.zookeeper/zookeeper "3.3.4"]
-                 [com.101tec/zkclient "0.3"]
+                 [com.101tec/zkclient "0.4"]
                  [com.yammer.metrics/metrics-core "2.2.0"]
                  [org.scala-lang/scala-library "2.10.1"]
                  [net.sf.jopt-simple/jopt-simple "3.2"]]

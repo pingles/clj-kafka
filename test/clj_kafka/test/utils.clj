@@ -1,12 +1,14 @@
 (ns clj-kafka.test.utils
-  (:import [kafka.server KafkaConfig KafkaServer]
-           [kafka.admin CreateTopicCommand]
-           [kafka.common TopicAndPartition]
-           [java.net InetSocketAddress]
-           [org.apache.zookeeper.server ZooKeeperServer NIOServerCnxn$Factory]
-           [org.apache.commons.io FileUtils]
-           [org.I0Itec.zkclient ZkClient]
-           [org.I0Itec.zkclient.serialize ZkSerializer])
+  (:import
+    [kafka.admin AdminUtils]
+    [kafka.server KafkaConfig KafkaServer]
+    [java.net InetSocketAddress]
+    [org.apache.zookeeper.server ZooKeeperServer NIOServerCnxn$Factory]
+    [org.apache.commons.io FileUtils]
+    [org.I0Itec.zkclient ZkClient]
+    [org.I0Itec.zkclient.serialize ZkSerializer]
+    [kafka.utils Time]
+    (java.util Properties))
   (:use [clojure.java.io :only (file)]
         [clj-kafka.core :only (as-properties)]))
 
@@ -14,7 +16,7 @@
   [& parts]
   (.getPath (apply file (System/getProperty "java.io.tmpdir") "clj-kafka" parts)))
 
-(def system-time (proxy [kafka.utils.Time] []
+(def system-time (proxy [Time] []
                    (milliseconds [] (System/currentTimeMillis))
                    (nanoseconds [] (System/nanoTime))
                    (sleep [ms] (Thread/sleep ms))))
@@ -22,14 +24,14 @@
 ;; enable.zookeeper doesn't seem to be used- check it actually has an effect
 (defn create-broker
   [{:keys [kafka-port zookeeper-port]}]
-  (let [base-config {"broker.id" "0"
-                     "port" "9999"
-                     "host.name" "localhost"
-                     "zookeeper.connect" (str "127.0.0.1:" zookeeper-port)
-                     "enable.zookeeper" "true"
+  (let [base-config {"broker.id"                   "0"
+                     "port"                        "9999"
+                     "host.name"                   "localhost"
+                     "zookeeper.connect"           (str "127.0.0.1:" zookeeper-port)
+                     "enable.zookeeper"            "true"
                      "log.flush.interval.messages" "1"
-                     "auto.create.topics.enable" "true"
-                     "log.dir" (.getAbsolutePath (file (tmp-dir "kafka-log")))}]
+                     "auto.create.topics.enable"   "true"
+                     "log.dir"                     (.getAbsolutePath (file (tmp-dir "kafka-log")))}]
     (KafkaServer. (KafkaConfig. (as-properties (assoc base-config "port" (str kafka-port))))
                   system-time)))
 
@@ -41,15 +43,16 @@
       (.startup zk))))
 
 (defn wait-until-initialised
-  [kafka-server topic]
-  (let [topic-and-partition (TopicAndPartition. topic 0)]
-    (while (not (.. kafka-server apis leaderCache keySet (contains topic-and-partition)))
+  [^KafkaServer kafka-server topic]
+  (let [apis (.apis kafka-server)
+        cache (.metadataCache apis)]
+    (while (not (.containsTopicAndPartition cache topic 0))
       (Thread/sleep 500))))
 
 (defn create-topic
   [zk-client topic & {:keys [partitions replicas]
                       :or   {partitions 1 replicas 1}}]
-  (CreateTopicCommand/createTopic zk-client topic partitions replicas ""))
+  (AdminUtils/createTopic zk-client topic partitions replicas (Properties.)))
 
 (def string-serializer (proxy [ZkSerializer] []
                          (serialize [data] (.getBytes data "UTF-8"))

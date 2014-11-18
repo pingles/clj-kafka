@@ -12,3 +12,5 @@ autodoc/**
 /tmp
 /logs
 .nrepl-port
+.idea
+*.iml
