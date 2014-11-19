@@ -8,7 +8,7 @@
     [org.I0Itec.zkclient ZkClient]
     [org.I0Itec.zkclient.serialize ZkSerializer]
     [kafka.utils Time]
-    (java.util Properties))
+    [java.util Properties])
   (:use [clojure.java.io :only (file)]
         [clj-kafka.core :only (as-properties)]))
 
