@@ -6,7 +6,7 @@
 
 (defn consumer
   "Uses information in Zookeeper to connect to Kafka. More info on settings
-   is available here: http://incubator.apache.org/kafka/configuration.html
+   is available here: https://kafka.apache.org/08/configuration.html
 
    Recommended for using with with-resource:
    (with-resource [c (consumer m)]
