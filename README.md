@@ -1,6 +1,6 @@
 # clj-kafka
 
-Clojure library for [Kafka](http://incubator.apache.org/kafka/).
+Clojure library for [Kafka](https://kafka.apache.org).
 
 Current build status: [![Build Status](https://travis-ci.org/pingles/clj-kafka.png)](https://travis-ci.org/pingles/clj-kafka)
 
