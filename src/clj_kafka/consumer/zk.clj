@@ -29,7 +29,7 @@
   (.shutdown consumer))
 
 (defn- lazy-iterate
-  [it]
+  [^java.util.Iterator it]
   (lazy-seq
    (when (.hasNext it)
      (cons (.next it) (lazy-iterate it)))))
