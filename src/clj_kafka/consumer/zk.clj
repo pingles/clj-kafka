@@ -41,6 +41,12 @@
   ([^ConsumerConnector consumer topic-count-map key-decoder value-decoder]
    (.createMessageStreams consumer topic-count-map key-decoder value-decoder)))
 
+(defn consume-stream
+  "Returns a lazy sequence of KafkaMessage messages from the stream."
+  [^KafkaStream stream]
+  (map to-clojure
+       (lazy-iterate (.iterator ^KafkaStream stream))))
+
 (defn messages
   "Provides a simple way to consume a sequence of KafkaMessage messages from the
   named topic. Consumes on a single thread and returns a lazy sequence."
@@ -51,5 +57,4 @@
                   (create-message-streams consumer topic-count-map key-decoder value-decoder)
                   (create-message-streams consumer topic-count-map))
         [stream & _] (get streams topic)]
-    (map to-clojure
-         (lazy-iterate (.iterator ^KafkaStream stream)))))
+    (consume-stream stream)))
