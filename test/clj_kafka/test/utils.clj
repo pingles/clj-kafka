@@ -44,9 +44,9 @@
 
 (defn wait-until-initialised
   [^KafkaServer kafka-server topic]
-  (let [apis (.apis kafka-server)
-        cache (.metadataCache apis)]
-    (while (not (.containsTopicAndPartition cache topic 0))
+  (let [cache (.. kafka-server apis metadataCache)
+        topics (scala.collection.JavaConversions/asScalaSet #{topic})]
+    (while (< (.. cache (getTopicMetadata  topics) size) 1)
       (Thread/sleep 500))))
 
 (defn create-topic
