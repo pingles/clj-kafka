@@ -1,6 +1,7 @@
 (ns clj-kafka.consumer.zk
   (:import [kafka.consumer ConsumerConfig Consumer KafkaStream]
-           [kafka.javaapi.consumer ConsumerConnector])
+           [kafka.javaapi.consumer ConsumerConnector]
+           [kafka.serializer DefaultDecoder])
   (:use [clj-kafka.core :only (as-properties to-clojure with-resource)])
   (:require [zookeeper :as zk]))
 
@@ -34,6 +35,11 @@
    (when (.hasNext it)
      (cons (.next it) (lazy-iterate it)))))
 
+(defn default-decoder
+  "Creates the default decoder that reads message keys and values as byte arrays."
+  []
+  (DefaultDecoder. nil))
+
 (defn create-message-streams
   "Creates message streams for consuming topics. "
   ([^ConsumerConnector consumer topic-count-map]
@@ -51,10 +57,10 @@
   "Provides an easy way to consume a sequence of KafkaMessage messages from the
   named topic. Consumes on a single thread and returns a lazy sequence."
   [^ConsumerConnector consumer topic & {:keys [key-decoder
-                                               value-decoder]}]
+                                               value-decoder]
+                                        :or   {key-decoder (default-decoder)
+                                               value-decoder (default-decoder)}}]
   (let [topic-count-map {topic (int 1)}
-        streams (if (or key-decoder value-decoder)
-                  (create-message-streams consumer topic-count-map key-decoder value-decoder)
-                  (create-message-streams consumer topic-count-map))
+        streams (create-message-streams consumer topic-count-map key-decoder value-decoder)
         [stream & _] (get streams topic)]
     (stream-seq stream)))
