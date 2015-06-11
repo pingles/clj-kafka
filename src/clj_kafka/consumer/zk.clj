@@ -48,7 +48,7 @@
        (lazy-iterate (.iterator ^KafkaStream stream))))
 
 (defn messages
-  "Provides a simple way to consume a sequence of KafkaMessage messages from the
+  "Provides an easy way to consume a sequence of KafkaMessage messages from the
   named topic. Consumes on a single thread and returns a lazy sequence."
   [^ConsumerConnector consumer topic & {:keys [key-decoder
                                                value-decoder]}]
