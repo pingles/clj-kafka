@@ -64,7 +64,9 @@ See: [clj-kafka.new.producer](https://pingles.github.io/clj-kafka/clj-kafka.new.
 
 ### Zookeeper Consumer
 
-The Zookeeper consumer uses broker information contained within Zookeeper to consume messages. This consumer also allows the client to automatically commit consumed offsets so they're not retrieved again.
+The Zookeeper consumer uses broker information contained within
+Zookeeper to consume messages. This consumer also allows the client to
+automatically commit consumed offsets so they're not retrieved again.
 
 ```clj
 (use 'clj-kafka.consumer.zk)
@@ -81,6 +83,27 @@ The Zookeeper consumer uses broker information contained within Zookeeper to con
 ```
 
 See: [clj-kafka.consumer.zk](https://pingles.github.io/clj-kafka/clj-kafka.consumer.zk.html)
+
+#### Usage with transducers
+
+An alternate way of consuming is using `create-message-stream` or
+`create-message-streams` to obtain `KafkaStream` instances. These are
+`Iterable` which means, amongst other things, that they work nicely
+with transducers.
+
+Continuing previous example:
+
+```clj
+;; hypothetcial transformation
+(def xform (comp (map deserialize-message)
+                 (filter production-traffic)
+                 (map parse-user-agent-string)))
+
+(with-resource [c (consumer config)]
+  shutdown
+  (let [stream (create-message-stream c "test-topic")]
+    (run! write-to-database! (eduction xform stream))))
+```
 
 
 ### Administration Operations
