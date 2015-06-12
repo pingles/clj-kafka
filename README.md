@@ -88,6 +88,17 @@ and has `delete.topic.enable` set to `true`)
 - retrieving topic configuration
 - changing topic configuration
 
+```clj
+(require '[clj-kafka.admin :as admin])
+
+(with-open [zk (admin/zk-client "127.0.0.1:2181")]
+  (if-not (admin/topic-exists? zk "test-topic")
+    (admin/topic-create zk "test-topic"
+                        {:partitions 3
+                         :replcation-factor 1
+                         :config {"cleanup.policy" "compact"}})))
+```
+
 See: [clj-kafka.admin](https://pingles.github.io/clj-kafka/clj-kafka.admin.html)
 
 
