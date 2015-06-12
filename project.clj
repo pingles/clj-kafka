@@ -6,6 +6,7 @@
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/data.json "0.2.2"]
                  [org.apache.kafka/kafka_2.10 "0.8.2.1"]
+                 [org.apache.kafka/kafka-clients "0.8.2.1"]
                  [zookeeper-clj "0.9.3"]]
   :exclusions [javax.mail/mail
                javax.jms/jms
