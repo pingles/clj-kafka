@@ -3,7 +3,7 @@
   http://kafka.apache.org/082/javadoc/org/apache/kafka/clients/producer/package-summary.html"}
   clj-kafka.new.producer
   (:refer-clojure :exclude [send])
-  (:import [org.apache.kafka.clients.producer Callback KafkaProducer ProducerRecord]
+  (:import [org.apache.kafka.clients.producer Callback KafkaProducer ProducerRecord RecordMetadata]
            [org.apache.kafka.common.serialization Serializer ByteArraySerializer StringSerializer]))
 
 (defn string-serializer [] (StringSerializer.))
@@ -32,17 +32,26 @@
   ([topic partition key value]
    (ProducerRecord. topic partition key value)))
 
+(defn- record-metadata->map
+  [^RecordMetadata m]
+  {:topic (.topic m)
+   :partition (.partition m)
+   :offfset (.offset m)})
+
 (defn send
-  "Asynchronously send a record to Kafka. Returns a `Future` with
-  `RecordMetadata`. Optionally provide a callback fn that will be
-  called when operation completes. Callback should be a fn of two
-  arguments, a `RecordMetadata` instance, and an exception. Exception
-  will be nil if operation succeeded.
+  "Asynchronously send a record to Kafka. Returns a map with `:topic`,
+  `:partition` and `:offset` keys, wrapped in a delay. Derefing delay
+  will block until the underlying future completes. Optionally provide
+  a callback fn that will be called when the operation completes.
+  Callback should be a fn of two arguments, a map as above, and an
+  exception. Exception will be nil if operation succeeded.
 
   For details on behaviour, see http://kafka.apache.org/082/javadoc/org/apache/kafka/clients/producer/KafkaProducer.html#send(org.apache.kafka.clients.producer.ProducerRecord,org.apache.kafka.clients.producer.Callback)"
   ([^KafkaProducer producer record]
-   (.send producer record))
+   (let [fut (.send producer record)]
+     (delay (record-metadata->map @fut))))
   ([^KafkaProducer producer record callback]
-   (.send producer record (reify Callback
-                            (onCompletion [_ metadata exception]
-                              (callback metadata exception))))))
+   (let [fut (.send producer record (reify Callback
+                                      (onCompletion [_ metadata exception]
+                                        (callback (and metadata (record-metadata->map metadata)) exception))))]
+     (delay (record-metadata->map @fut)))))
