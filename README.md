@@ -33,6 +33,30 @@ Discovery of Kafka brokers from Zookeeper:
 (send-message p (message "test" (.getBytes "this is my message")))
 ```
 
+### New Producer
+
+As of 0.3.2, we also support the "new" pure-Java producer. The
+interface is superficially similar, but we've chosen to keep names
+close to their Java equivalent, so API is slightly different to old
+producer.
+
+```clj
+(use 'clj-kafka.new.producer)
+
+(with-open [p (producer {"bootstrap.servers" "127.0.0.1:9092"})]
+  (send (record "test-topic" (.getBytes "hello world!"))))
+```
+
+One key difference is that sending is asynchrounous by default. `send`
+returns a `delay` immediately. If you want synchrounous behaviour, you
+can deref it right away:
+
+```clj
+(with-open [p (producer {"bootstrap.servers" "127.0.0.1:9092"})]
+  @(send (record "test-topic" (.getBytes "hello world!"))))
+```
+
+
 ### Zookeeper Consumer
 
 The Zookeeper consumer uses broker information contained within Zookeeper to consume messages. This consumer also allows the client to automatically commit consumed offsets so they're not retrieved again.
