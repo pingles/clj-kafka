@@ -99,7 +99,7 @@ with transducers.
 Continuing previous example:
 
 ```clj
-;; hypothetcial transformation
+;; hypothetical transformation
 (def xform (comp (map deserialize-message)
                  (filter production-traffic)
                  (map parse-user-agent-string)))
