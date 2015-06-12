@@ -33,6 +33,9 @@ Discovery of Kafka brokers from Zookeeper:
 (send-message p (message "test" (.getBytes "this is my message")))
 ```
 
+See: [clj-kafka.producer](https://pingles.github.io/clj-kafka/clj-kafka.producer.html)
+
+
 ### New Producer
 
 As of 0.3.2, we also support the "new" pure-Java producer. The
@@ -76,6 +79,9 @@ The Zookeeper consumer uses broker information contained within Zookeeper to con
   shutdown
   (take 2 (messages c "test")))
 ```
+
+See: [clj-kafka.consumer.zk](https://pingles.github.io/clj-kafka/clj-kafka.consumer.zk.html)
+
 
 ### Administration Operations
 
