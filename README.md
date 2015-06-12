@@ -56,6 +56,8 @@ can deref it right away:
   @(send (record "test-topic" (.getBytes "hello world!"))))
 ```
 
+See: [clj-kafka.new.producer](https://pingles.github.io/clj-kafka/clj-kafka.new.producer.html)
+
 
 ### Zookeeper Consumer
 
@@ -74,6 +76,20 @@ The Zookeeper consumer uses broker information contained within Zookeeper to con
   shutdown
   (take 2 (messages c "test")))
 ```
+
+### Administration Operations
+
+There is support the following simple administration operations:
+
+- checking if a topic exists
+- creating a topic
+- deleting a topic (requires that the Kafka cluster supports deletion
+and has `delete.topic.enable` set to `true`)
+- retrieving topic configuration
+- changing topic configuration
+
+See: [clj-kafka.admin](https://pingles.github.io/clj-kafka/clj-kafka.admin.html)
+
 
 ## License
 
