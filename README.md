@@ -4,7 +4,7 @@ Clojure library for [Kafka](https://kafka.apache.org).
 
 Current build status: [![Build Status](https://travis-ci.org/pingles/clj-kafka.png)](https://travis-ci.org/pingles/clj-kafka)
 
-Development is against the 0.8 release of Kafka. The protocols for 0.7 and 0.8 are incompatible so this will only work when connecting to a 0.8 cluster. Earlier releases of clj-kafka support the earlier 0.7 release if you need it.
+Development is against the 0.8 release of Kafka. 
 
 ## Installing
 
