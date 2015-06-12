@@ -38,10 +38,9 @@ See: [clj-kafka.producer](https://pingles.github.io/clj-kafka/clj-kafka.producer
 
 ### New Producer
 
-As of 0.3.2, we also support the "new" pure-Java producer. The
-interface is superficially similar, but we've chosen to keep names
-close to their Java equivalent, so API is slightly different to old
-producer.
+As of 0.3.1 we also support the "new" pure-Java producer. The
+interface is superficially similar but we've chosen to keep names
+close to their Java equivalent.
 
 ```clj
 (use 'clj-kafka.new.producer)
@@ -50,8 +49,8 @@ producer.
   (send (record "test-topic" (.getBytes "hello world!"))))
 ```
 
-One key difference is that sending is asynchrounous by default. `send`
-returns a `Future` immediately. If you want synchrounous behaviour,
+One key difference is that sending is asynchronous by default. `send`
+returns a `Future` immediately. If you want synchronous behaviour
 you can deref it right away:
 
 ```clj
@@ -81,6 +80,12 @@ automatically commit consumed offsets so they're not retrieved again.
   shutdown
   (take 2 (messages c "test")))
 ```
+
+The `messages` function provides the easy-case of single topic and single thread consumption. This
+is a stricter form of the same API that was in earlier releases. `messages` is built on two key
+other functions: `create-message-streams` and `stream-seq` that create the underlying streams and
+turn them into lazy sequences respectively; this change makes it easier to consume across multiple
+partitions and threads.
 
 See: [clj-kafka.consumer.zk](https://pingles.github.io/clj-kafka/clj-kafka.consumer.zk.html)
 
