@@ -3,7 +3,8 @@
   http://kafka.apache.org/082/javadoc/org/apache/kafka/clients/producer/package-summary.html"}
   clj-kafka.new.producer
   (:refer-clojure :exclude [send])
-  (:import [org.apache.kafka.clients.producer Callback KafkaProducer ProducerRecord RecordMetadata]
+  (:import [java.util.concurrent Future TimeUnit TimeoutException]
+           [org.apache.kafka.clients.producer Callback KafkaProducer ProducerRecord RecordMetadata]
            [org.apache.kafka.common.serialization Serializer ByteArraySerializer StringSerializer]))
 
 (defn string-serializer [] (StringSerializer.))
@@ -38,10 +39,19 @@
    :partition (.partition m)
    :offfset (.offset m)})
 
+(defn- map-future-val
+  [^Future fut f]
+  (reify
+    java.util.concurrent.Future
+    (cancel [_ interrupt?] (.cancel fut interrupt?))
+    (get [_] (f (.get fut)))
+    (get [_ timeout unit] (f (.get fut timeout unit)))
+    (isCancelled [_] (.isCancelled fut))
+    (isDone [_] (.isDone fut))))
+
 (defn send
-  "Asynchronously send a record to Kafka. Returns a map with `:topic`,
-  `:partition` and `:offset` keys, wrapped in a delay. Derefing delay
-  will block until the underlying future completes. Optionally provide
+  "Asynchronously send a record to Kafka. Returns a `Future` of a map
+  with `:topic`, `:partition` and `:offset` keys. Optionally provide
   a callback fn that will be called when the operation completes.
   Callback should be a fn of two arguments, a map as above, and an
   exception. Exception will be nil if operation succeeded.
@@ -49,9 +59,9 @@
   For details on behaviour, see http://kafka.apache.org/082/javadoc/org/apache/kafka/clients/producer/KafkaProducer.html#send(org.apache.kafka.clients.producer.ProducerRecord,org.apache.kafka.clients.producer.Callback)"
   ([^KafkaProducer producer record]
    (let [fut (.send producer record)]
-     (delay (record-metadata->map @fut))))
+     (map-future-val fut record-metadata->map)))
   ([^KafkaProducer producer record callback]
    (let [fut (.send producer record (reify Callback
                                       (onCompletion [_ metadata exception]
                                         (callback (and metadata (record-metadata->map metadata)) exception))))]
-     (delay (record-metadata->map @fut)))))
+     (map-future-val fut record-metadata->map))))
