@@ -40,12 +40,27 @@
   []
   (DefaultDecoder. nil))
 
+(defn- vals->ints
+  [m]
+  (reduce-kv (fn [res k v] (assoc res k (int v))) {} m))
+
 (defn create-message-streams
-  "Creates message streams for consuming topics. "
+  "Creates multiple message streams for consuming multiple topics, or
+  a single topic cusing multiple threads. topic-count-map is a map
+  from a topic name to the number of streams desired for that topic."
   ([^ConsumerConnector consumer topic-count-map]
-   (.createMessageStreams consumer topic-count-map))
+   (.createMessageStreams consumer (vals->ints topic-count-map)))
   ([^ConsumerConnector consumer topic-count-map key-decoder value-decoder]
-   (.createMessageStreams consumer topic-count-map key-decoder value-decoder)))
+   (.createMessageStreams consumer (vals->ints topic-count-map) key-decoder value-decoder)))
+
+(defn create-message-stream
+  "Creates a single message stream for given topic."
+  ([^ConsumerConnector consumer topic]
+   (let [topic-streams (.createMessageStreams consumer {topic (int 1)})]
+     (first (get topic-streams topic))))
+  ([^ConsumerConnector consumer topic key-decoder value-decoder]
+   (let [topic-streams (.createMessageStreams consumer {topic (int 1)} key-decoder value-decoder)]
+     (first (get topic-streams topic)))))
 
 (defn stream-seq
   "Returns a lazy sequence of KafkaMessage messages from the stream."
@@ -60,7 +75,4 @@
                                                value-decoder]
                                         :or   {key-decoder (default-decoder)
                                                value-decoder (default-decoder)}}]
-  (let [topic-count-map {topic (int 1)}
-        streams (create-message-streams consumer topic-count-map key-decoder value-decoder)
-        [stream & _] (get streams topic)]
-    (stream-seq stream)))
+  (stream-seq (create-message-stream consumer topic key-decoder value-decoder)))
