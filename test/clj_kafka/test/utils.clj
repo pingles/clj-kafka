@@ -9,6 +9,7 @@
     [org.I0Itec.zkclient.serialize ZkSerializer]
     [kafka.utils Time]
     [java.util Properties])
+  (:require [clj-kafka.admin :as admin])
   (:use [clojure.java.io :only (file)]
         [clj-kafka.core :only (as-properties)]))
 
@@ -50,15 +51,6 @@
     (while (< (.. cache (getTopicMetadata  topics) size) 1)
       (Thread/sleep 500))))
 
-(defn create-topic
-  [zk-client topic & {:keys [partitions replicas]
-                      :or   {partitions 1 replicas 1}}]
-  (AdminUtils/createTopic zk-client topic partitions replicas (Properties.)))
-
-(def string-serializer (proxy [ZkSerializer] []
-                         (serialize [data] (.getBytes data "UTF-8"))
-                         (deserialize [bytes] (when bytes
-                                                (String. bytes "UTF-8")))))
 
 (defmacro with-test-broker
   "Creates an in-process broker that can be used to test against"
@@ -69,8 +61,10 @@
              topic# (:topic ~config)]
          (try
            (.startup kafka#)
-           (let [zk-client# (ZkClient. (str "127.0.0.1:" (:zookeeper-port ~config)) 500 500 string-serializer)]
-             (create-topic zk-client# topic#)
+           (let [zk-client# (admin/zk-client (str "127.0.0.1:" (:zookeeper-port ~config))
+                                             {:session-timeout-ms 500
+                                              :connection-timeout-ms 500})]
+             (admin/create-topic zk-client# topic#)
              (wait-until-initialised kafka# topic#)
              ~@body)
            (finally (do (.shutdown kafka#)
