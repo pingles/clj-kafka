@@ -24,7 +24,7 @@
    (KafkaProducer. config key-serializer value-serializer)))
 
 (defn record
-  "Return a record that can be published to Kafka using `send`."
+  "Return a record that can be published to Kafka using [[send]]."
   ([topic value]
    (ProducerRecord. topic value))
   ([topic key value]
@@ -39,7 +39,7 @@
   arguments, a `RecordMetadata` instance, and an exception. Exception
   will be nil if operation succeeded.
 
-  For details on behaviour, see: http://kafka.apache.org/082/javadoc/org/apache/kafka/clients/producer/KafkaProducer.html#send(org.apache.kafka.clients.producer.ProducerRecord, org.apache.kafka.clients.producer.Callback)"
+  For details on behaviour, see http://kafka.apache.org/082/javadoc/org/apache/kafka/clients/producer/KafkaProducer.html#send(org.apache.kafka.clients.producer.ProducerRecord,org.apache.kafka.clients.producer.Callback)"
   ([^KafkaProducer producer record]
    (.send producer record))
   ([^KafkaProducer producer record callback]
