@@ -3,7 +3,7 @@
     [kafka.admin AdminUtils]
     [kafka.server KafkaConfig KafkaServer]
     [java.net InetSocketAddress]
-    [org.apache.zookeeper.server ZooKeeperServer NIOServerCnxn$Factory]
+    [org.apache.zookeeper.server ZooKeeperServer NIOServerCnxnFactory]
     [org.apache.commons.io FileUtils]
     [org.I0Itec.zkclient ZkClient]
     [org.I0Itec.zkclient.serialize ZkSerializer]
@@ -39,14 +39,15 @@
   [{:keys [zookeeper-port]}]
   (let [tick-time 500
         zk (ZooKeeperServer. (file (tmp-dir "zookeeper-snapshot")) (file (tmp-dir "zookeeper-log")) tick-time)]
-    (doto (NIOServerCnxn$Factory. (InetSocketAddress. "127.0.0.1" zookeeper-port))
+    (doto (NIOServerCnxnFactory.)
+      (.configure (InetSocketAddress. "127.0.0.1" zookeeper-port) 10)
       (.startup zk))))
 
 (defn wait-until-initialised
   [^KafkaServer kafka-server topic]
-  (let [apis (.apis kafka-server)
-        cache (.metadataCache apis)]
-    (while (not (.containsTopicAndPartition cache topic 0))
+  (let [cache (.. kafka-server apis metadataCache)
+        topics (scala.collection.JavaConversions/asScalaSet #{topic})]
+    (while (< (.. cache (getTopicMetadata  topics) size) 1)
       (Thread/sleep 500))))
 
 (defn create-topic

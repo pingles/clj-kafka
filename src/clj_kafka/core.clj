@@ -43,7 +43,7 @@
 
   Broker
   (to-clojure [x]
-    {:connect (.getConnectionString x)
+    {:connect (.connectionString x)
      :host (.host x)
      :port (.port x)
      :broker-id (.id x)})
