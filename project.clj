@@ -13,7 +13,11 @@
                com.sun.jdmk/jmxtools
                com.sun.jmx/jmxri
                jline/jline]
-  :plugins [[lein-expectations "0.0.8"]]
+  :plugins [[lein-expectations "0.0.8"]
+            [codox "0.8.12"]]
+  :codox {:src-dir-uri "http://github.com/pingles/clj-kafka/blob/master/"
+          :src-linenum-anchor-prefix "L"          
+          :defaults {:doc/format :markdown}}
   :profiles {:dev {:dependencies [[commons-io/commons-io "2.4"]
                                   [expectations "1.4.45"]]}}
   :description "Clojure wrapper for Kafka's Java API")
