@@ -1,4 +1,4 @@
-(defproject clj-kafka/clj-kafka "0.3.0-0.8.1.1"
+(defproject clj-kafka/clj-kafka "0.3.1-SNAPSHOT"
   :min-lein-version "2.0.0"
   :url "https://github.com/pingles/clj-kafka"
   :license {:name "Eclipse Public License"
