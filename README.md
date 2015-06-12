@@ -51,8 +51,8 @@ producer.
 ```
 
 One key difference is that sending is asynchrounous by default. `send`
-returns a `delay` immediately. If you want synchrounous behaviour, you
-can deref it right away:
+returns a `Future` immediately. If you want synchrounous behaviour,
+you can deref it right away:
 
 ```clj
 (with-open [p (producer {"bootstrap.servers" "127.0.0.1:9092"})]
