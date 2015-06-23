@@ -129,7 +129,7 @@ and has `delete.topic.enable` set to `true`)
   (if-not (admin/topic-exists? zk "test-topic")
     (admin/topic-create zk "test-topic"
                         {:partitions 3
-                         :replcation-factor 1
+                         :replication-factor 1
                          :config {"cleanup.policy" "compact"}})))
 ```
 
