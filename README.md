@@ -4,7 +4,7 @@ Clojure library for [Kafka](https://kafka.apache.org).
 
 Current build status: [![Build Status](https://travis-ci.org/pingles/clj-kafka.png)](https://travis-ci.org/pingles/clj-kafka)
 
-Development is against the 0.8 release of Kafka. 
+Development is against the 0.8 release of Kafka.
 
 ## Installing
 
@@ -45,8 +45,8 @@ close to their Java equivalent.
 ```clj
 (use 'clj-kafka.new.producer)
 
-(with-open [p (producer {"bootstrap.servers" "127.0.0.1:9092"})]
-  (send (record "test-topic" (.getBytes "hello world!"))))
+(with-open [p (producer {"bootstrap.servers" "127.0.0.1:9092"} (byte-array-serializer) (byte-array-serializer))]
+  (send p (record "test-topic" (.getBytes "hello world!"))))
 ```
 
 One key difference is that sending is asynchronous by default. `send`
@@ -54,8 +54,8 @@ returns a `Future` immediately. If you want synchronous behaviour
 you can deref it right away:
 
 ```clj
-(with-open [p (producer {"bootstrap.servers" "127.0.0.1:9092"})]
-  @(send (record "test-topic" (.getBytes "hello world!"))))
+(with-open [p (producer {"bootstrap.servers" "127.0.0.1:9092"} (byte-array-serializer) (byte-array-serializer))]
+  @(send p (record "test-topic" (.getBytes "hello world!"))))
 ```
 
 See: [clj-kafka.new.producer](https://pingles.github.io/clj-kafka/clj-kafka.new.producer.html)
