@@ -37,7 +37,7 @@
   [^RecordMetadata m]
   {:topic (.topic m)
    :partition (.partition m)
-   :offfset (.offset m)})
+   :offset (.offset m)})
 
 (defn- map-future-val
   [^Future fut f]
