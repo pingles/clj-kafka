@@ -2,9 +2,9 @@
   (:import [java.nio ByteBuffer]
            [java.util Properties]
            [kafka.message MessageAndMetadata MessageAndOffset]
-           [java.util.concurrent LinkedBlockingQueue]
-           [kafka.javaapi OffsetResponse PartitionMetadata TopicMetadata TopicMetadataResponse]
-           [kafka.cluster Broker]))
+           [kafka.javaapi PartitionMetadata TopicMetadata TopicMetadataResponse ConsumerMetadataResponse OffsetFetchResponse OffsetCommitResponse]
+           [kafka.cluster Broker]
+           ))
 
 (defrecord KafkaMessage [topic offset partition key value])
 
@@ -63,4 +63,21 @@
 
   TopicMetadataResponse
   (to-clojure [x]
-    (map to-clojure (.topicsMetadata x))))
+    (map to-clojure (.topicsMetadata x)))
+
+  OffsetFetchResponse
+  (to-clojure [x]
+    (into {} (for [[k v] (.offsets x)] [(str (.topic k) ":" (.partition k)) v])))
+
+  OffsetCommitResponse
+  (to-clojure [x]
+    (if (.hasError x)
+      {:has-error true
+       :errors (into {} (for [[k v] (.errors x)] [(str (.topic k) ":" (.partition k)) v]))}
+      {:has-error false}))
+
+  ConsumerMetadataResponse
+  (to-clojure [x]
+    {:error-code (.errorCode x)
+     :coordinator (.coordinator x)
+     }))
