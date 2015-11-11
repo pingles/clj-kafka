@@ -16,14 +16,16 @@
                    client-id))
 
 (defn fetch-request
-  [client-id topic ^Long partition offset fetch-size]
+  [client-id topic ^Long partition offset fetch-size & {:keys [max-wait min-bytes]}]
   (.build (doto (FetchRequestBuilder. )
             (.clientId client-id)
-            (.addFetch topic (Integer/valueOf partition) offset fetch-size))))
+            (.addFetch topic (Integer/valueOf partition) offset fetch-size)
+            (#(when max-wait (.maxWait % max-wait)))
+            (#(when min-bytes (.minBytes % min-bytes))))))
 
 (defn messages
-  [^SimpleConsumer consumer client-id topic partition offset fetch-size]
-  (let [fetch (fetch-request client-id topic partition offset fetch-size)]
+  [^SimpleConsumer consumer client-id topic partition offset fetch-size & more]
+  (let [fetch (apply fetch-request client-id topic partition offset fetch-size more)]
     (map to-clojure (iterator-seq (.iterator (.messageSet ^FetchResponse (.fetch consumer ^FetchRequest fetch)
                                                           topic
                                                           partition))))))
