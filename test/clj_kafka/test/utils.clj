@@ -29,7 +29,7 @@
                      "port"                        "9999"
                      "host.name"                   "localhost"
                      "zookeeper.connect"           (str "127.0.0.1:" zookeeper-port)
-                     "enable.zookeeper"            "true"
+                     ;"enable.zookeeper"            "true"
                      "log.flush.interval.messages" "1"
                      "auto.create.topics.enable"   "true"
                      "log.dir"                     (.getAbsolutePath (file (tmp-dir "kafka-log")))}]
@@ -41,7 +41,7 @@
   (let [tick-time 500
         zk (ZooKeeperServer. (file (tmp-dir "zookeeper-snapshot")) (file (tmp-dir "zookeeper-log")) tick-time)]
     (doto (NIOServerCnxnFactory.)
-      (.configure (InetSocketAddress. "127.0.0.1" zookeeper-port) 10)
+      (.configure (InetSocketAddress. "127.0.0.1" zookeeper-port) 100)
       (.startup zk))))
 
 (defn wait-until-initialised

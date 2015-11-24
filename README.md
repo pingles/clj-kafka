@@ -136,6 +136,24 @@ and has `delete.topic.enable` set to `true`)
 See: [clj-kafka.admin](https://pingles.github.io/clj-kafka/clj-kafka.admin.html)
 
 
+### Kafka Offset Manager Operations
+
+There is support the following simple Kafka offset management operations:
+
+- fetch the current offsets of a consumer group
+- reset the current offsets of a consumer group
+
+```clj
+(require '[clj-kafka.offset :as offset])
+
+(fetch-consumer-offsets "broker1:9092,broker1:9092" {"zookeeper.connect" "zkhost:2182"} "my-topic" "my-consumer")
+(reset-consumer-offsets "broker1:9092,broker1:9092" {"zookeeper.connect" "zkhost:2182"} "my-topic" "my-consumer" :earliest)
+(reset-consumer-offsets "broker1:9092,broker1:9092" {"zookeeper.connect" "zkhost:2182"} "my-topic" "my-consumer" :latest)
+```
+
+See: [clj-kafka.admin](https://pingles.github.io/clj-kafka/clj-kafka.offset.html)
+
+
 ## License
 
 Copyright &copy; 2013 Paul Ingles
